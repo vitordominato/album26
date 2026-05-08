@@ -1,0 +1,104 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isGroupMember(groupId) {
+      return isSignedIn() &&
+        request.auth.uid in get(/databases/$(database)/documents/groups/$(groupId)).data.memberIds;
+    }
+
+    // Catálogo público (read-only): seleções, jogadores, figurinhas
+    match /teams/{teamId} {
+      allow read: if true;
+      allow write: if false; // só via Admin SDK (seed)
+
+      match /players/{playerId} {
+        allow read: if true;
+        allow write: if false;
+      }
+    }
+
+    match /stickers/{stickerId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Usuários: só o próprio dono lê/escreve seu perfil e coleção
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow create: if isOwner(userId)
+        && request.resource.data.keys().hasAll(['email', 'displayName', 'createdAt']);
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+
+      match /collection/{stickerId} {
+        allow read: if isOwner(userId);
+        allow write: if isOwner(userId)
+          && request.resource.data.quantity is int
+          && request.resource.data.quantity >= 0;
+      }
+    }
+
+    // Grupos: qualquer autenticado pode ler (necessário para entrar via código de convite);
+    // só membros conseguem atualizar; só o criador deleta.
+    match /groups/{groupId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn()
+        && request.resource.data.createdBy == request.auth.uid
+        && request.auth.uid in request.resource.data.memberIds;
+      allow update: if isGroupMember(groupId)
+        // só permite mexer em memberIds (entrar/sair) ou nome — nunca trocar criador/inviteCode
+        && request.resource.data.createdBy == resource.data.createdBy
+        && request.resource.data.inviteCode == resource.data.inviteCode;
+      allow delete: if isSignedIn() && resource.data.createdBy == request.auth.uid;
+
+      match /members/{userId} {
+        allow read: if isGroupMember(groupId);
+        allow create: if isSignedIn() && request.auth.uid == userId;
+        allow update: if isOwner(userId);
+        allow delete: if isOwner(userId)
+          || get(/databases/$(database)/documents/groups/$(groupId)).data.createdBy == request.auth.uid;
+      }
+    }
+
+    // Trocas: leitura/escrita só pelas duas partes envolvidas
+    match /trades/{tradeId} {
+      allow read: if isSignedIn() && (
+        request.auth.uid == resource.data.fromUserId ||
+        request.auth.uid == resource.data.toUserId
+      );
+      allow create: if isSignedIn()
+        && request.auth.uid == request.resource.data.fromUserId
+        && request.resource.data.status == 'pending';
+      allow update: if isSignedIn() && (
+        request.auth.uid == resource.data.fromUserId ||
+        request.auth.uid == resource.data.toUserId
+      );
+      allow delete: if isSignedIn() && request.auth.uid == resource.data.fromUserId;
+    }
+
+    // Notificações: só o dono lê
+    match /notifications/{userId}/items/{notifId} {
+      allow read: if isOwner(userId);
+      allow update: if isOwner(userId)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
+      allow delete: if isOwner(userId);
+      allow create: if false; // só via Cloud Functions (Admin SDK)
+    }
+
+    // Match suggestions calculadas pela Cloud Function (read-only para o usuário)
+    match /matches/{userId}/suggestions/{matchId} {
+      allow read: if isOwner(userId);
+      allow write: if false;
+    }
+  }
+}
