@@ -9,12 +9,18 @@ App colaborativo para gerenciar o álbum de figurinhas da FIFA World Cup 2026. C
 ## Funcionalidades
 
 - 48 seleções × 20 figurinhas = **960 cromos**
-- 19 figurinhas FWC especiais (mascotes, bola Trionda, emblemas das sedes, momentos históricos)
+- 19 figurinhas FWC especiais (emblema, slogan, bola Trionda, mascotes Maple/Zayu/Clutch, países-sede, 10 momentos históricos)
+- **979 cromos colados** no contador de progresso (a capa do álbum, que totaliza os 980 oficiais, não é colável e fica de fora)
+- Numeração por seleção (1–20): #1 escudo metalizado, #13 time posado **exclusivo McDonald's**, demais são jogadores
+- 12 grupos da Copa (A–L) com filtro próprio na lista de seleções
+- Bandeira de cada seleção e nomes prováveis dos jogadores (revisar quando o álbum oficial sair)
 - Sincronização em tempo real entre celulares (Firestore `onSnapshot`)
 - Cada álbum tem código de 6 caracteres para compartilhar
 - Dashboard com progresso total, por confederação e por seleção
 - Lista de faltantes e repetidas, formatada para WhatsApp
 - Funciona como PWA (dá pra "instalar" na tela inicial do celular)
+
+> **Sobre os nomes dos jogadores:** as listas em `src/players.js` foram montadas a partir de convocações recentes de cada seleção (18 jogadores por time: posições #2-#12 e #14-#20). Antes de publicar oficialmente, revise comparando com o álbum Panini lançado.
 
 ---
 

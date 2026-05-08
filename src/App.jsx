@@ -11,7 +11,7 @@ import {
 
 import {
   TEAMS, TEAM_PLAYERS, STICKERS_PER_TEAM, FWC_STICKERS, SPECIAL_SECTIONS,
-  CONF_LABELS, CONF_ORDER, TOTAL_STICKERS,
+  CONF_LABELS, CONF_ORDER, GROUP_ORDER, TOTAL_STICKERS,
   generateCode, stickerKey, getStickerInfo, getStickerStatus,
   teamProgress, sectionProgress, totalProgress,
 } from './data.js';
@@ -539,12 +539,26 @@ function Header({ title, subtitle, onBack, action }) {
 }
 
 function TeamsListScreen({ album, onBack, onSelect }) {
+  // filter format: 'TODAS' | 'CONF:<id>' | 'GRP:<letter>'
   const [filter, setFilter] = useState('TODAS');
   const filtered = useMemo(() => {
     if (filter === 'TODAS') return TEAMS;
-    return TEAMS.filter(t => t.conf === filter);
+    if (filter.startsWith('CONF:')) {
+      const c = filter.slice(5);
+      return TEAMS.filter(t => t.conf === c);
+    }
+    if (filter.startsWith('GRP:')) {
+      const g = filter.slice(4);
+      return TEAMS.filter(t => t.group === g);
+    }
+    return TEAMS;
   }, [filter]);
-  const confs = ['TODAS', ...CONF_ORDER];
+
+  const filters = [
+    { id: 'TODAS', label: 'Todas' },
+    ...CONF_ORDER.map(c => ({ id: `CONF:${c}`, label: CONF_LABELS[c] })),
+    ...GROUP_ORDER.map(g => ({ id: `GRP:${g}`, label: `Grupo ${g}` })),
+  ];
 
   return (
     <div className="px-5 pt-4">
@@ -552,15 +566,15 @@ function TeamsListScreen({ album, onBack, onSelect }) {
 
       <div className="overflow-x-auto -mx-5 px-5 mb-4 pb-1 no-scrollbar">
         <div className="flex gap-2 w-max">
-          {confs.map(c => (
-            <button key={c} onClick={() => setFilter(c)}
+          {filters.map(f => (
+            <button key={f.id} onClick={() => setFilter(f.id)}
                     className="px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wide whitespace-nowrap"
                     style={{
-                      background: filter === c ? '#0d3520' : 'white',
-                      color: filter === c ? 'white' : '#0d3520',
-                      border: '1px solid ' + (filter === c ? '#0d3520' : '#e8dfc8'),
+                      background: filter === f.id ? '#0d3520' : 'white',
+                      color: filter === f.id ? 'white' : '#0d3520',
+                      border: '1px solid ' + (filter === f.id ? '#0d3520' : '#e8dfc8'),
                     }}>
-              {c === 'TODAS' ? 'Todas' : CONF_LABELS[c]}
+              {f.label}
             </button>
           ))}
         </div>
@@ -577,8 +591,11 @@ function TeamsListScreen({ album, onBack, onSelect }) {
                     style={{ background: 'white', border: '1px solid ' + (complete ? '#d4a437' : '#e8dfc8') }}>
               <div className="text-3xl shrink-0">{team.flag}</div>
               <div className="flex-1 min-w-0 text-left">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <div className="font-bold truncate" style={{ color: '#0d3520' }}>{team.name}</div>
+                  <span className="text-[9px] px-1.5 py-0.5 rounded font-bold" style={{ background: '#f0e8d2', color: '#8a7a4f' }}>
+                    GRUPO {team.group}
+                  </span>
                   {team.host && (
                     <span className="text-[9px] px-1.5 py-0.5 rounded font-bold" style={{ background: '#d4a437', color: '#0d3520' }}>SEDE</span>
                   )}
@@ -622,7 +639,9 @@ function TeamDetailScreen({ album, teamCode, onBack, onUpdate }) {
 
   return (
     <div className="px-5 pt-4">
-      <Header title={team.name} subtitle={CONF_LABELS[team.conf]} onBack={onBack} />
+      <Header title={team.name}
+              subtitle={`Grupo ${team.group} · ${CONF_LABELS[team.conf]}`}
+              onBack={onBack} />
 
       <div className="rounded-3xl p-5 mb-5 relative overflow-hidden shadow-md"
            style={{ background: 'linear-gradient(135deg, #0d3520 0%, #1a5634 100%)' }}>
@@ -641,6 +660,14 @@ function TeamDetailScreen({ album, teamCode, onBack, onUpdate }) {
 
       <div className="text-xs font-bold uppercase tracking-widest mb-3 px-1 opacity-60" style={{ color: '#0d3520' }}>
         Toque para alternar · Use −/+ para repetidas
+      </div>
+
+      <div className="rounded-xl p-3 mb-3 text-[11px] flex items-start gap-2"
+           style={{ background: '#fff7e0', border: '1px solid #f0d98a', color: '#7a5a1f' }}>
+        <span aria-hidden="true">⚠️</span>
+        <span>
+          <b>#1</b> é o escudo metalizado · <b>#13</b> é o time posado, exclusivo dos pacotinhos do McDonald's.
+        </span>
       </div>
 
       <div className="grid grid-cols-2 gap-2.5">

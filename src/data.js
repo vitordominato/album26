@@ -1,8 +1,28 @@
-// Dados do álbum: 48 seleções × 20 figurinhas + 19 cromos FWC especiais.
-// Os nomes dos jogadores e detalhes dos cromos podem ser ajustados quando o
-// álbum oficial for divulgado — a estrutura abaixo já cobre toda a UI.
+import { TEAM_PLAYERS } from './players.js';
+
+// Estrutura oficial do álbum Panini FIFA World Cup 2026™.
+// 48 seleções × 20 cromos = 960
+// 19 cromos especiais FWC (FWC-1 a FWC-19)
+// (a capa do álbum existe mas não é colável e não entra no progresso)
+// Total colável = 979 cromos · Total oficial divulgado = 980 (inclui capa)
 
 export const STICKERS_PER_TEAM = 20;
+
+// Tipos de cromo dentro de uma seleção
+//   #1: escudo metalizado
+//   #2..#12, #14..#20: jogadores (18 no total)
+//   #13: foto do time posado (exclusivo McDonald's, só nos pacotinhos do fast-food)
+export const STICKER_KIND = {
+  ESCUDO: 'ESCUDO',
+  JOGADOR: 'JOGADOR',
+  TIME_POSADO: 'TIME_POSADO',
+};
+
+export function getTeamStickerKind(num) {
+  if (num === 1) return STICKER_KIND.ESCUDO;
+  if (num === 13) return STICKER_KIND.TIME_POSADO;
+  return STICKER_KIND.JOGADOR;
+}
 
 export const CONF_ORDER = ['CONMEBOL', 'UEFA', 'CONCACAF', 'CAF', 'AFC', 'OFC'];
 
@@ -15,97 +35,109 @@ export const CONF_LABELS = {
   OFC: 'OFC',
 };
 
+export const GROUP_ORDER = ['A','B','C','D','E','F','G','H','I','J','K','L'];
+
+// 48 seleções nos 12 grupos do Mundial 2026.
 export const TEAMS = [
-  // Anfitriões (Concacaf)
-  { code: 'USA', name: 'Estados Unidos', conf: 'CONCACAF', flag: '🇺🇸', host: true },
-  { code: 'CAN', name: 'Canadá',         conf: 'CONCACAF', flag: '🇨🇦', host: true },
-  { code: 'MEX', name: 'México',         conf: 'CONCACAF', flag: '🇲🇽', host: true },
+  // Grupo A
+  { code: 'MEX', name: 'México',           conf: 'CONCACAF', flag: '🇲🇽', group: 'A', host: true },
+  { code: 'RSA', name: 'África do Sul',    conf: 'CAF',      flag: '🇿🇦', group: 'A' },
+  { code: 'KOR', name: 'Coreia do Sul',    conf: 'AFC',      flag: '🇰🇷', group: 'A' },
+  { code: 'CZE', name: 'República Tcheca', conf: 'UEFA',     flag: '🇨🇿', group: 'A' },
 
-  // Conmebol
-  { code: 'BRA', name: 'Brasil',    conf: 'CONMEBOL', flag: '🇧🇷' },
-  { code: 'ARG', name: 'Argentina', conf: 'CONMEBOL', flag: '🇦🇷' },
-  { code: 'URU', name: 'Uruguai',   conf: 'CONMEBOL', flag: '🇺🇾' },
-  { code: 'COL', name: 'Colômbia',  conf: 'CONMEBOL', flag: '🇨🇴' },
-  { code: 'ECU', name: 'Equador',   conf: 'CONMEBOL', flag: '🇪🇨' },
-  { code: 'PAR', name: 'Paraguai',  conf: 'CONMEBOL', flag: '🇵🇾' },
+  // Grupo B
+  { code: 'CAN', name: 'Canadá',                conf: 'CONCACAF', flag: '🇨🇦', group: 'B', host: true },
+  { code: 'BIH', name: 'Bósnia e Herzegovina',  conf: 'UEFA',     flag: '🇧🇦', group: 'B' },
+  { code: 'QAT', name: 'Catar',                 conf: 'AFC',      flag: '🇶🇦', group: 'B' },
+  { code: 'SUI', name: 'Suíça',                 conf: 'UEFA',     flag: '🇨🇭', group: 'B' },
 
-  // UEFA
-  { code: 'ESP', name: 'Espanha',     conf: 'UEFA', flag: '🇪🇸' },
-  { code: 'FRA', name: 'França',      conf: 'UEFA', flag: '🇫🇷' },
-  { code: 'ENG', name: 'Inglaterra',  conf: 'UEFA', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
-  { code: 'POR', name: 'Portugal',    conf: 'UEFA', flag: '🇵🇹' },
-  { code: 'GER', name: 'Alemanha',    conf: 'UEFA', flag: '🇩🇪' },
-  { code: 'ITA', name: 'Itália',      conf: 'UEFA', flag: '🇮🇹' },
-  { code: 'NED', name: 'Países Baixos', conf: 'UEFA', flag: '🇳🇱' },
-  { code: 'BEL', name: 'Bélgica',     conf: 'UEFA', flag: '🇧🇪' },
-  { code: 'CRO', name: 'Croácia',     conf: 'UEFA', flag: '🇭🇷' },
-  { code: 'SUI', name: 'Suíça',       conf: 'UEFA', flag: '🇨🇭' },
-  { code: 'DEN', name: 'Dinamarca',   conf: 'UEFA', flag: '🇩🇰' },
-  { code: 'POL', name: 'Polônia',     conf: 'UEFA', flag: '🇵🇱' },
-  { code: 'AUT', name: 'Áustria',     conf: 'UEFA', flag: '🇦🇹' },
-  { code: 'SRB', name: 'Sérvia',      conf: 'UEFA', flag: '🇷🇸' },
-  { code: 'TUR', name: 'Turquia',     conf: 'UEFA', flag: '🇹🇷' },
-  { code: 'NOR', name: 'Noruega',     conf: 'UEFA', flag: '🇳🇴' },
-  { code: 'SCO', name: 'Escócia',     conf: 'UEFA', flag: '🏴󠁧󠁢󠁳󠁣󠁴󠁿' },
+  // Grupo C
+  { code: 'BRA', name: 'Brasil',   conf: 'CONMEBOL', flag: '🇧🇷', group: 'C' },
+  { code: 'MAR', name: 'Marrocos', conf: 'CAF',      flag: '🇲🇦', group: 'C' },
+  { code: 'HAI', name: 'Haiti',    conf: 'CONCACAF', flag: '🇭🇹', group: 'C' },
+  { code: 'SCO', name: 'Escócia',  conf: 'UEFA',     flag: '🏴󠁧󠁢󠁳󠁣󠁴󠁿', group: 'C' },
 
-  // CAF
-  { code: 'MAR', name: 'Marrocos',    conf: 'CAF', flag: '🇲🇦' },
-  { code: 'SEN', name: 'Senegal',     conf: 'CAF', flag: '🇸🇳' },
-  { code: 'EGY', name: 'Egito',       conf: 'CAF', flag: '🇪🇬' },
-  { code: 'ALG', name: 'Argélia',     conf: 'CAF', flag: '🇩🇿' },
-  { code: 'TUN', name: 'Tunísia',     conf: 'CAF', flag: '🇹🇳' },
-  { code: 'NGA', name: 'Nigéria',     conf: 'CAF', flag: '🇳🇬' },
-  { code: 'GHA', name: 'Gana',        conf: 'CAF', flag: '🇬🇭' },
-  { code: 'CIV', name: 'Costa do Marfim', conf: 'CAF', flag: '🇨🇮' },
-  { code: 'CMR', name: 'Camarões',    conf: 'CAF', flag: '🇨🇲' },
+  // Grupo D
+  { code: 'USA', name: 'Estados Unidos', conf: 'CONCACAF', flag: '🇺🇸', group: 'D', host: true },
+  { code: 'PAR', name: 'Paraguai',       conf: 'CONMEBOL', flag: '🇵🇾', group: 'D' },
+  { code: 'AUS', name: 'Austrália',      conf: 'AFC',      flag: '🇦🇺', group: 'D' },
+  { code: 'TUR', name: 'Turquia',        conf: 'UEFA',     flag: '🇹🇷', group: 'D' },
 
-  // AFC
-  { code: 'JPN', name: 'Japão',         conf: 'AFC', flag: '🇯🇵' },
-  { code: 'KOR', name: 'Coreia do Sul', conf: 'AFC', flag: '🇰🇷' },
-  { code: 'IRN', name: 'Irã',           conf: 'AFC', flag: '🇮🇷' },
-  { code: 'AUS', name: 'Austrália',     conf: 'AFC', flag: '🇦🇺' },
-  { code: 'KSA', name: 'Arábia Saudita', conf: 'AFC', flag: '🇸🇦' },
-  { code: 'QAT', name: 'Catar',         conf: 'AFC', flag: '🇶🇦' },
-  { code: 'UZB', name: 'Uzbequistão',   conf: 'AFC', flag: '🇺🇿' },
-  { code: 'JOR', name: 'Jordânia',      conf: 'AFC', flag: '🇯🇴' },
+  // Grupo E
+  { code: 'GER', name: 'Alemanha',        conf: 'UEFA',     flag: '🇩🇪', group: 'E' },
+  { code: 'CUW', name: 'Curaçao',         conf: 'CONCACAF', flag: '🇨🇼', group: 'E' },
+  { code: 'CIV', name: 'Costa do Marfim', conf: 'CAF',      flag: '🇨🇮', group: 'E' },
+  { code: 'ECU', name: 'Equador',         conf: 'CONMEBOL', flag: '🇪🇨', group: 'E' },
 
-  // Concacaf (vagas restantes)
-  { code: 'PAN', name: 'Panamá',     conf: 'CONCACAF', flag: '🇵🇦' },
-  { code: 'CRC', name: 'Costa Rica', conf: 'CONCACAF', flag: '🇨🇷' },
-  { code: 'JAM', name: 'Jamaica',    conf: 'CONCACAF', flag: '🇯🇲' },
+  // Grupo F
+  { code: 'NED', name: 'Países Baixos', conf: 'UEFA', flag: '🇳🇱', group: 'F' },
+  { code: 'JPN', name: 'Japão',         conf: 'AFC',  flag: '🇯🇵', group: 'F' },
+  { code: 'SWE', name: 'Suécia',        conf: 'UEFA', flag: '🇸🇪', group: 'F' },
+  { code: 'TUN', name: 'Tunísia',       conf: 'CAF',  flag: '🇹🇳', group: 'F' },
 
-  // OFC
-  { code: 'NZL', name: 'Nova Zelândia', conf: 'OFC', flag: '🇳🇿' },
+  // Grupo G
+  { code: 'BEL', name: 'Bélgica',       conf: 'UEFA', flag: '🇧🇪', group: 'G' },
+  { code: 'EGY', name: 'Egito',         conf: 'CAF',  flag: '🇪🇬', group: 'G' },
+  { code: 'IRN', name: 'Irã',           conf: 'AFC',  flag: '🇮🇷', group: 'G' },
+  { code: 'NZL', name: 'Nova Zelândia', conf: 'OFC',  flag: '🇳🇿', group: 'G' },
 
-  // Repescagens (placeholders até definir)
-  { code: 'PO1', name: 'Repescagem 1', conf: 'AFC', flag: '🏳️' },
-  { code: 'PO2', name: 'Repescagem 2', conf: 'CONCACAF', flag: '🏳️' },
+  // Grupo H
+  { code: 'ESP', name: 'Espanha',         conf: 'UEFA',     flag: '🇪🇸', group: 'H' },
+  { code: 'CPV', name: 'Cabo Verde',      conf: 'CAF',      flag: '🇨🇻', group: 'H' },
+  { code: 'KSA', name: 'Arábia Saudita',  conf: 'AFC',      flag: '🇸🇦', group: 'H' },
+  { code: 'URU', name: 'Uruguai',         conf: 'CONMEBOL', flag: '🇺🇾', group: 'H' },
+
+  // Grupo I
+  { code: 'FRA', name: 'França',  conf: 'UEFA', flag: '🇫🇷', group: 'I' },
+  { code: 'SEN', name: 'Senegal', conf: 'CAF',  flag: '🇸🇳', group: 'I' },
+  { code: 'IRQ', name: 'Iraque',  conf: 'AFC',  flag: '🇮🇶', group: 'I' },
+  { code: 'NOR', name: 'Noruega', conf: 'UEFA', flag: '🇳🇴', group: 'I' },
+
+  // Grupo J
+  { code: 'ARG', name: 'Argentina', conf: 'CONMEBOL', flag: '🇦🇷', group: 'J' },
+  { code: 'ALG', name: 'Argélia',   conf: 'CAF',      flag: '🇩🇿', group: 'J' },
+  { code: 'AUT', name: 'Áustria',   conf: 'UEFA',     flag: '🇦🇹', group: 'J' },
+  { code: 'JOR', name: 'Jordânia',  conf: 'AFC',      flag: '🇯🇴', group: 'J' },
+
+  // Grupo K
+  { code: 'POR', name: 'Portugal',     conf: 'UEFA',     flag: '🇵🇹', group: 'K' },
+  { code: 'COD', name: 'RD do Congo',  conf: 'CAF',      flag: '🇨🇩', group: 'K' },
+  { code: 'UZB', name: 'Uzbequistão',  conf: 'AFC',      flag: '🇺🇿', group: 'K' },
+  { code: 'COL', name: 'Colômbia',     conf: 'CONMEBOL', flag: '🇨🇴', group: 'K' },
+
+  // Grupo L
+  { code: 'ENG', name: 'Inglaterra', conf: 'UEFA', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', group: 'L' },
+  { code: 'CRO', name: 'Croácia',    conf: 'UEFA', flag: '🇭🇷', group: 'L' },
+  { code: 'GHA', name: 'Gana',       conf: 'CAF',  flag: '🇬🇭', group: 'L' },
+  { code: 'PAN', name: 'Panamá',     conf: 'CONCACAF', flag: '🇵🇦', group: 'L' },
 ];
 
-// Mapa opcional de jogadores por seleção. Quando vazio, a UI exibe "#XX".
-export const TEAM_PLAYERS = {};
+// Mapa de jogadores por seleção: TEAM_PLAYERS[code][num-1] vira o nome no
+// cromo. As listas vivem em players.js — baseadas em convocações recentes,
+// devem ser revisadas quando o álbum oficial Panini sair.
+export { TEAM_PLAYERS };
 
-// 19 cromos FWC especiais — agrupados por categoria para a tela de detalhes.
+// 19 cromos especiais FWC, conforme estrutura oficial divulgada pela Panini.
 export const FWC_STICKERS = [
-  { num: 1,  name: 'Logo Oficial 2026',   tag: 'OFICIAL', tagColor: '#d4a437' },
-  { num: 2,  name: 'Bola Trionda',         tag: 'OFICIAL', tagColor: '#d4a437' },
-  { num: 3,  name: 'Troféu',                tag: 'OFICIAL', tagColor: '#d4a437' },
-  { num: 4,  name: 'Maple (Canadá)',        tag: 'MASCOTE', tagColor: '#c1272d' },
-  { num: 5,  name: 'Zayu (México)',         tag: 'MASCOTE', tagColor: '#c1272d' },
-  { num: 6,  name: 'Clutch (EUA)',          tag: 'MASCOTE', tagColor: '#c1272d' },
-  { num: 7,  name: 'Estados Unidos',        tag: 'SEDE',    tagColor: '#1a5634' },
-  { num: 8,  name: 'Canadá',                tag: 'SEDE',    tagColor: '#1a5634' },
-  { num: 9,  name: 'México',                tag: 'SEDE',    tagColor: '#1a5634' },
-  { num: 10, name: 'Uruguai 1930',          tag: 'MOMENTO', tagColor: '#0d3520' },
-  { num: 11, name: 'Brasil 1958',           tag: 'MOMENTO', tagColor: '#0d3520' },
-  { num: 12, name: 'Inglaterra 1966',       tag: 'MOMENTO', tagColor: '#0d3520' },
-  { num: 13, name: 'Brasil 1970',           tag: 'MOMENTO', tagColor: '#0d3520' },
-  { num: 14, name: 'Argentina 1986',        tag: 'MOMENTO', tagColor: '#0d3520' },
-  { num: 15, name: 'Brasil 1994',           tag: 'MOMENTO', tagColor: '#0d3520' },
-  { num: 16, name: 'França 1998',           tag: 'MOMENTO', tagColor: '#0d3520' },
-  { num: 17, name: 'Brasil 2002',           tag: 'MOMENTO', tagColor: '#0d3520' },
-  { num: 18, name: 'Espanha 2010',          tag: 'MOMENTO', tagColor: '#0d3520' },
-  { num: 19, name: 'Argentina 2022',        tag: 'MOMENTO', tagColor: '#0d3520' },
+  { num: 1,  name: 'Emblema Oficial',     tag: 'OFICIAL', tagColor: '#d4a437' },
+  { num: 2,  name: 'Slogan Oficial',      tag: 'OFICIAL', tagColor: '#d4a437' },
+  { num: 3,  name: 'Bola Trionda',        tag: 'OFICIAL', tagColor: '#d4a437' },
+  { num: 4,  name: 'Maple (Canadá)',      tag: 'MASCOTE', tagColor: '#c1272d' },
+  { num: 5,  name: 'Zayu (México)',       tag: 'MASCOTE', tagColor: '#c1272d' },
+  { num: 6,  name: 'Clutch (EUA)',        tag: 'MASCOTE', tagColor: '#c1272d' },
+  { num: 7,  name: 'Sede — Canadá',       tag: 'SEDE',    tagColor: '#1a5634' },
+  { num: 8,  name: 'Sede — México',       tag: 'SEDE',    tagColor: '#1a5634' },
+  { num: 9,  name: 'Sede — Estados Unidos', tag: 'SEDE',  tagColor: '#1a5634' },
+  { num: 10, name: 'Uruguai 1930',        tag: 'MOMENTO', tagColor: '#0d3520' },
+  { num: 11, name: 'Suíça 1954',          tag: 'MOMENTO', tagColor: '#0d3520' },
+  { num: 12, name: 'Brasil 1958',         tag: 'MOMENTO', tagColor: '#0d3520' },
+  { num: 13, name: 'Inglaterra 1966',     tag: 'MOMENTO', tagColor: '#0d3520' },
+  { num: 14, name: 'Brasil 1970',         tag: 'MOMENTO', tagColor: '#0d3520' },
+  { num: 15, name: 'Argentina 1986',      tag: 'MOMENTO', tagColor: '#0d3520' },
+  { num: 16, name: 'França 1998',         tag: 'MOMENTO', tagColor: '#0d3520' },
+  { num: 17, name: 'Brasil 2002',         tag: 'MOMENTO', tagColor: '#0d3520' },
+  { num: 18, name: 'Espanha 2010',        tag: 'MOMENTO', tagColor: '#0d3520' },
+  { num: 19, name: 'Argentina 2022',      tag: 'MOMENTO', tagColor: '#0d3520' },
 ];
 
 export const SPECIAL_SECTIONS = [
@@ -114,13 +146,16 @@ export const SPECIAL_SECTIONS = [
     name: 'FIFA World Cup',
     icon: '🏆',
     count: 19,
-    desc: 'Cromos especiais: oficiais, mascotes, sedes e momentos históricos',
+    desc: 'Especiais: oficiais, mascotes, sedes e momentos históricos',
   },
 ];
 
 export const TOTAL_STICKERS =
   TEAMS.length * STICKERS_PER_TEAM +
   SPECIAL_SECTIONS.reduce((s, sec) => s + sec.count, 0);
+
+// Total oficial divulgado pela Panini (inclui a capa, que não é colável).
+export const TOTAL_OFICIAL = TOTAL_STICKERS + 1;
 
 export function generateCode() {
   const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -141,12 +176,19 @@ export function getStickerInfo(code, num) {
     const list = code === 'FWC' ? FWC_STICKERS : [];
     const s = list[num - 1];
     return s
-      ? { name: s.name, tag: s.tag, tagColor: s.tagColor }
-      : { name: `#${num}`, tag: '', tagColor: '' };
+      ? { name: s.name, tag: s.tag, tagColor: s.tagColor, kind: 'FWC' }
+      : { name: `#${num}`, tag: '', tagColor: '', kind: 'FWC' };
+  }
+  const kind = getTeamStickerKind(num);
+  if (kind === STICKER_KIND.ESCUDO) {
+    return { name: 'Escudo', tag: 'METALIZADO', tagColor: '#d4a437', kind };
+  }
+  if (kind === STICKER_KIND.TIME_POSADO) {
+    return { name: 'Time posado', tag: "MCDONALD'S", tagColor: '#c1272d', kind };
   }
   const players = TEAM_PLAYERS[code];
   const name = players && players[num - 1] ? players[num - 1] : `#${num}`;
-  return { name, tag: '', tagColor: '' };
+  return { name, tag: '', tagColor: '', kind };
 }
 
 export function getStickerStatus(album, key) {
