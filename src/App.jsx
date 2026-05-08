@@ -840,8 +840,8 @@ function MissingScreen({ album, onBack, showToast, initialTab = 'missing' }) {
         if (s.count === 0) miss.push({ num: i, name: info.name, tag: info.tag });
         if (s.count > 1) dup.push({ num: i, name: info.name, tag: info.tag, count: s.count - 1 });
       }
-      if (miss.length) missingByGroup[team.code] = { name: team.name, flag: team.flag, items: miss };
-      if (dup.length) dupesByGroup[team.code] = { name: team.name, flag: team.flag, items: dup };
+      if (miss.length) missingByGroup[team.code] = { name: team.name, flag: team.flag, items: miss, kind: 'TEAM' };
+      if (dup.length) dupesByGroup[team.code] = { name: team.name, flag: team.flag, items: dup, kind: 'TEAM' };
       totalMissing += miss.length;
       totalDupes += dup.reduce((s, d) => s + d.count, 0);
     });
@@ -854,8 +854,8 @@ function MissingScreen({ album, onBack, showToast, initialTab = 'missing' }) {
         if (s.count === 0) miss.push({ num: i, name: info.name, tag: info.tag });
         if (s.count > 1) dup.push({ num: i, name: info.name, tag: info.tag, count: s.count - 1 });
       }
-      if (miss.length) missingByGroup[sec.id] = { name: sec.name, flag: sec.icon, items: miss };
-      if (dup.length) dupesByGroup[sec.id] = { name: sec.name, flag: sec.icon, items: dup };
+      if (miss.length) missingByGroup[sec.id] = { name: sec.name, flag: sec.icon, items: miss, kind: 'SPECIAL' };
+      if (dup.length) dupesByGroup[sec.id] = { name: sec.name, flag: sec.icon, items: dup, kind: 'SPECIAL' };
       totalMissing += miss.length;
       totalDupes += dup.reduce((s, d) => s + d.count, 0);
     });
@@ -899,6 +899,8 @@ function MissingScreen({ album, onBack, showToast, initialTab = 'missing' }) {
 
   const groups = tab === 'missing' ? missingByGroup : dupesByGroup;
   const isEmpty = Object.keys(groups).length === 0;
+  const teamEntries = Object.entries(groups).filter(([, g]) => g.kind === 'TEAM');
+  const specialEntries = Object.entries(groups).filter(([, g]) => g.kind === 'SPECIAL');
 
   return (
     <div className="px-5 pt-4">
@@ -945,44 +947,77 @@ function MissingScreen({ album, onBack, showToast, initialTab = 'missing' }) {
           </p>
         </div>
       ) : (
-        <div className="space-y-3">
-          {Object.entries(groups).map(([code, g]) => (
-            <div key={code} className="rounded-2xl p-4 shadow-sm" style={{ background: 'white', border: '1px solid #e8dfc8' }}>
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-xl">{g.flag}</span>
-                <span className="font-bold flex-1" style={{ color: '#0d3520' }}>{g.name}</span>
-                <span className="text-xs font-bold px-2 py-1 rounded-full"
-                      style={{
-                        background: tab === 'missing' ? '#fde8e8' : '#fef3d7',
-                        color: tab === 'missing' ? '#c1272d' : '#8a6a1f',
-                      }}>
-                  {tab === 'missing' ? g.items.length : g.items.reduce((s, d) => s + d.count, 0)}
+        <div className="space-y-5">
+          {teamEntries.length > 0 && (
+            <div>
+              <div className="flex items-center justify-between mb-2 px-1">
+                <h3 className="display-font text-lg leading-none" style={{ color: '#0d3520' }}>
+                  SELEÇÕES
+                </h3>
+                <span className="text-xs font-bold opacity-60" style={{ color: '#0d3520' }}>
+                  {teamEntries.length} de {TEAMS.length}
                 </span>
               </div>
-              <div className="space-y-1">
-                {g.items.map((it, i) => (
-                  <div key={i} className="flex items-center gap-2 text-sm py-1"
-                       style={{ borderTop: i > 0 ? '1px solid #f5efe1' : 'none', paddingTop: i > 0 ? 6 : 0 }}>
-                    <span className="font-mono font-bold tabular-nums text-xs px-1.5 py-0.5 rounded shrink-0"
-                          style={{ background: '#f5efe1', color: '#8a7a4f', minWidth: 38, textAlign: 'center' }}>
-                      {code === 'FWC' ? `FWC-${it.num}` : String(it.num).padStart(2, '0')}
-                    </span>
-                    <span className="flex-1 truncate" style={{ color: '#0d3520' }}>{it.name}</span>
-                    {it.tag && (
-                      <span className="text-[9px] uppercase font-bold px-1.5 py-0.5 rounded shrink-0"
-                            style={{ background: '#f0e8d2', color: '#8a7a4f' }}>{it.tag}</span>
-                    )}
-                    {tab === 'dupes' && it.count > 1 && (
-                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0"
-                            style={{ background: '#d4a437', color: '#0d3520' }}>{it.count}x</span>
-                    )}
-                  </div>
-                ))}
+              <div className="space-y-3">
+                {teamEntries.map(([code, g]) => renderGroupCard(code, g))}
               </div>
             </div>
-          ))}
+          )}
+          {specialEntries.length > 0 && (
+            <div>
+              <div className="flex items-center justify-between mb-2 px-1">
+                <h3 className="display-font text-lg leading-none" style={{ color: '#0d3520' }}>
+                  ESPECIAIS FWC
+                </h3>
+                <span className="text-xs font-bold opacity-60" style={{ color: '#0d3520' }}>
+                  {specialEntries.length} {specialEntries.length === 1 ? 'seção' : 'seções'}
+                </span>
+              </div>
+              <div className="space-y-3">
+                {specialEntries.map(([code, g]) => renderGroupCard(code, g))}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
   );
+
+  function renderGroupCard(code, g) {
+    return (
+      <div key={code} className="rounded-2xl p-4 shadow-sm" style={{ background: 'white', border: '1px solid #e8dfc8' }}>
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-xl">{g.flag}</span>
+          <span className="font-bold flex-1" style={{ color: '#0d3520' }}>{g.name}</span>
+          <span className="text-xs font-bold px-2 py-1 rounded-full"
+                style={{
+                  background: tab === 'missing' ? '#fde8e8' : '#fef3d7',
+                  color: tab === 'missing' ? '#c1272d' : '#8a6a1f',
+                }}>
+            {tab === 'missing' ? g.items.length : g.items.reduce((s, d) => s + d.count, 0)}
+          </span>
+        </div>
+        <div className="space-y-1">
+          {g.items.map((it, i) => (
+            <div key={i} className="flex items-center gap-2 text-sm py-1"
+                 style={{ borderTop: i > 0 ? '1px solid #f5efe1' : 'none', paddingTop: i > 0 ? 6 : 0 }}>
+              <span className="font-mono font-bold tabular-nums text-xs px-1.5 py-0.5 rounded shrink-0"
+                    style={{ background: '#f5efe1', color: '#8a7a4f', minWidth: 38, textAlign: 'center' }}>
+                {code === 'FWC' ? `FWC-${it.num}` : String(it.num).padStart(2, '0')}
+              </span>
+              <span className="flex-1 truncate" style={{ color: '#0d3520' }}>{it.name}</span>
+              {it.tag && (
+                <span className="text-[9px] uppercase font-bold px-1.5 py-0.5 rounded shrink-0"
+                      style={{ background: '#f0e8d2', color: '#8a7a4f' }}>{it.tag}</span>
+              )}
+              {tab === 'dupes' && it.count > 1 && (
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0"
+                      style={{ background: '#d4a437', color: '#0d3520' }}>{it.count}x</span>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 }
