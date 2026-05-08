@@ -1,0 +1,69 @@
+rules_version = '2';
+
+// Regras do Firestore para o app Álbum Copa 2026.
+//
+// Modelo de segurança: sem autenticação. O "segredo" é o código de 6
+// caracteres do álbum (~1 bilhão de combinações no alfabeto base32 sem
+// ambíguos). Quem tem o código pode ler e escrever; quem não tem, não
+// consegue enumerar nem deduzir álbuns.
+//
+// Esta regra valida formato, schema e imutabilidade dos campos críticos,
+// sem precisar exigir login.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ------- helpers -------
+
+    // Código gerado por generateCode(): 6 chars do alfabeto
+    // 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789' (sem I, O, 0, 1).
+    function isValidCode(code) {
+      return code.matches('^[A-HJ-NP-Z2-9]{6}$');
+    }
+
+    function isValidName(name) {
+      return name is string && name.size() > 0 && name.size() <= 60;
+    }
+
+    function isValidCreate(data, code) {
+      return data.keys().hasOnly(['name', 'code', 'stickers', 'createdAt', 'updatedAt'])
+          && data.code == code
+          && isValidName(data.name)
+          && data.stickers is map
+          && data.stickers.size() <= 1000
+          && data.createdAt is number
+          && data.updatedAt is number;
+    }
+
+    function isValidUpdate(before, after) {
+      return after.code == before.code
+          && after.createdAt == before.createdAt
+          && isValidName(after.name)
+          && after.stickers is map
+          && after.stickers.size() <= 1000
+          && after.updatedAt is number;
+    }
+
+    // ------- regras -------
+
+    match /albums/{code} {
+      // Bloqueia listagem da coleção inteira: impede enumerar todos os
+      // álbuns existentes. App sempre lê por ID conhecido.
+      allow list: if false;
+
+      // Leitura por ID: livre (qualquer um com o código de 6 chars).
+      allow get: if isValidCode(code);
+
+      // Criação: só com formato e schema corretos.
+      allow create: if isValidCode(code)
+                    && isValidCreate(request.resource.data, code);
+
+      // Update: preserva code/createdAt e valida o resto.
+      allow update: if isValidCode(code)
+                    && isValidUpdate(resource.data, request.resource.data);
+
+      // Delete: bloqueado. Limpeza só via console do Firebase.
+      allow delete: if false;
+    }
+  }
+}
