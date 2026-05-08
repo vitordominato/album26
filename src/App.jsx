@@ -174,7 +174,7 @@ export default function App() {
                 onUpdate={updateStickers} />
             )
             : view.name === 'missing' ? (
-              <MissingScreen album={albumData}
+              <MissingScreen album={albumData} initialTab={view.tab || 'missing'}
                 onBack={() => setView({ name: 'overview', code: view.code })}
                 showToast={showToast} />
             ) : null}
@@ -351,7 +351,7 @@ function AlbumListItem({ album, onOpen, onRemove }) {
 function OverviewScreen({ album, syncing, onBack, onNavigate, onRefresh, showToast }) {
   const [showShare, setShowShare] = useState(false);
   const stats = useMemo(() => totalProgress(album), [album]);
-  const pct = Math.round((stats.have / stats.total) * 100);
+  const pct = stats.total > 0 ? Math.round((stats.have / stats.total) * 100) : 0;
   const fwcStats = useMemo(() => sectionProgress(album, 'FWC', 19), [album]);
 
   const confData = useMemo(() => {
@@ -362,7 +362,8 @@ function OverviewScreen({ album, syncing, onBack, onNavigate, onRefresh, showToa
       map[t.conf].have += p.have; map[t.conf].total += p.total;
     });
     return Object.values(map).filter(d => d.total > 0).map(d => ({
-      ...d, label: CONF_LABELS[d.conf], pct: Math.round((d.have / d.total) * 100),
+      ...d, label: CONF_LABELS[d.conf],
+      pct: d.total > 0 ? Math.round((d.have / d.total) * 100) : 0,
     }));
   }, [album]);
 
@@ -431,7 +432,7 @@ function OverviewScreen({ album, syncing, onBack, onNavigate, onRefresh, showToa
         <NavCard icon={<ListChecks size={20} />} title="FALTANTES" subtitle="Lista para trocar"
                  onClick={() => onNavigate({ name: 'missing', code: album.code })} highlight />
         <NavCard icon={<BarChart3 size={20} />} title="REPETIDAS" subtitle={`${stats.dupes} para trocar`}
-                 onClick={() => onNavigate({ name: 'missing', code: album.code })} />
+                 onClick={() => onNavigate({ name: 'missing', code: album.code, tab: 'dupes' })} />
       </div>
 
       <div className="mb-3 px-1">
@@ -568,8 +569,8 @@ function TeamsListScreen({ album, onBack, onSelect }) {
       <div className="space-y-2">
         {filtered.map(team => {
           const p = teamProgress(album, team.code);
-          const pct = Math.round((p.have / p.total) * 100);
-          const complete = p.have === p.total;
+          const pct = p.total > 0 ? Math.round((p.have / p.total) * 100) : 0;
+          const complete = p.total > 0 && p.have === p.total;
           return (
             <button key={team.code} onClick={() => onSelect(team.code)}
                     className="w-full rounded-2xl p-4 flex items-center gap-3 shadow-sm active:scale-95 transition-transform"
@@ -608,7 +609,16 @@ function TeamsListScreen({ album, onBack, onSelect }) {
 function TeamDetailScreen({ album, teamCode, onBack, onUpdate }) {
   const team = TEAMS.find(t => t.code === teamCode);
   const p = teamProgress(album, teamCode);
-  const pct = Math.round((p.have / p.total) * 100);
+  const pct = p.total > 0 ? Math.round((p.have / p.total) * 100) : 0;
+
+  if (!team) {
+    return (
+      <div className="px-5 pt-4">
+        <Header title="Seleção" onBack={onBack} />
+        <p className="text-sm" style={{ color: '#0d3520' }}>Seleção não encontrada.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="px-5 pt-4">
@@ -714,8 +724,16 @@ function StickerCard({ number, name, tag, tagColor, count, onChange }) {
 
 function SectionDetailScreen({ album, secId, onBack, onUpdate }) {
   const section = SPECIAL_SECTIONS.find(s => s.id === secId);
+  if (!section) {
+    return (
+      <div className="px-5 pt-4">
+        <Header title="Seção" onBack={onBack} />
+        <p className="text-sm" style={{ color: '#0d3520' }}>Seção não encontrada.</p>
+      </div>
+    );
+  }
   const p = sectionProgress(album, secId, section.count);
-  const pct = Math.round((p.have / p.total) * 100);
+  const pct = p.total > 0 ? Math.round((p.have / p.total) * 100) : 0;
 
   const groups = useMemo(() => {
     const result = { OFICIAL: [], MASCOTE: [], SEDE: [], MOMENTO: [] };
@@ -779,8 +797,8 @@ function SectionDetailScreen({ album, secId, onBack, onUpdate }) {
   );
 }
 
-function MissingScreen({ album, onBack, showToast }) {
-  const [tab, setTab] = useState('missing');
+function MissingScreen({ album, onBack, showToast, initialTab = 'missing' }) {
+  const [tab, setTab] = useState(initialTab);
 
   const { missingByGroup, dupesByGroup, totalMissing, totalDupes } = useMemo(() => {
     const missingByGroup = {};
