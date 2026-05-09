@@ -33,7 +33,7 @@ export function useAuth() {
             createdAt: serverTimestamp() as unknown as Date,
           };
           await setDoc(ref, newProfile);
-          setProfile({ uid: firebaseUser.uid, ...(newProfile as UserProfile) });
+          setProfile({ ...(newProfile as UserProfile), uid: firebaseUser.uid });
         }
       } else {
         setProfile(null);

@@ -1,4 +1,6 @@
-import type { Timestamp } from 'firebase/firestore';
+import type { FieldValue, Timestamp } from 'firebase/firestore';
+
+export type FsTimestamp = Timestamp | Date | FieldValue;
 
 export type Confederation = 'CONMEBOL' | 'UEFA' | 'CONCACAF' | 'AFC' | 'CAF' | 'OFC';
 
@@ -20,15 +22,15 @@ export interface UserProfile {
   photoURL: string | null;
   fcmToken?: string | null;
   locale?: 'pt-BR' | 'en' | 'es';
-  createdAt: Timestamp | Date;
-  updatedAt?: Timestamp | Date;
+  createdAt: FsTimestamp;
+  updatedAt?: FsTimestamp;
 }
 
 export interface CollectionEntry {
   stickerId: string;
   quantity: number;
-  obtainedAt: Timestamp | Date;
-  updatedAt: Timestamp | Date;
+  obtainedAt: FsTimestamp;
+  updatedAt: FsTimestamp;
 }
 
 export interface Team {
@@ -72,14 +74,14 @@ export interface Group {
   name: string;
   inviteCode: string;
   createdBy: string;
-  createdAt: Timestamp | Date;
+  createdAt: FsTimestamp;
   memberIds: string[];
 }
 
 export interface GroupMember {
   userId: string;
   role: 'owner' | 'admin' | 'member';
-  joinedAt: Timestamp | Date;
+  joinedAt: FsTimestamp;
   displayName: string;
   photoURL: string | null;
 }
@@ -97,8 +99,8 @@ export interface Trade {
   offerStickerIds: string[]; // figurinhas que o `from` oferece
   requestStickerIds: string[]; // figurinhas que o `from` quer
   message?: string;
-  createdAt: Timestamp | Date;
-  updatedAt: Timestamp | Date;
+  createdAt: FsTimestamp;
+  updatedAt: FsTimestamp;
 }
 
 export interface AppNotification {
@@ -107,7 +109,7 @@ export interface AppNotification {
   message: string;
   data?: Record<string, unknown>;
   read: boolean;
-  createdAt: Timestamp | Date;
+  createdAt: FsTimestamp;
 }
 
 export interface MatchSuggestion {
@@ -118,5 +120,5 @@ export interface MatchSuggestion {
   iCanGive: string[]; // stickerIds
   iCanGet: string[]; // stickerIds
   score: number; // qualidade do match
-  updatedAt: Timestamp | Date;
+  updatedAt: FsTimestamp;
 }
