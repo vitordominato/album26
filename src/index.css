@@ -2,18 +2,80 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body, #root {
-  height: 100%;
-  margin: 0;
-  padding: 0;
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 4%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 4%;
+    --primary: 152 60% 13%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 42 56% 54%;
+    --secondary-foreground: 240 6% 10%;
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 4% 46%;
+    --accent: 240 5% 96%;
+    --accent-foreground: 240 6% 10%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 6% 90%;
+    --input: 240 6% 90%;
+    --ring: 152 60% 13%;
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 152 40% 6%;
+    --foreground: 0 0% 98%;
+    --card: 152 35% 9%;
+    --card-foreground: 0 0% 98%;
+    --primary: 42 56% 54%;
+    --primary-foreground: 152 60% 13%;
+    --secondary: 152 30% 16%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 152 25% 14%;
+    --muted-foreground: 152 10% 65%;
+    --accent: 152 25% 16%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 152 25% 18%;
+    --input: 152 25% 18%;
+    --ring: 42 56% 54%;
+  }
+
+  * {
+    @apply border-border;
+  }
+  html, body, #root {
+    height: 100%;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: none;
+  }
+  button, [role='button'] {
+    @apply select-none;
+    touch-action: manipulation;
+  }
 }
 
-body {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overscroll-behavior-y: none;
+@layer components {
+  .safe-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+  .safe-top {
+    padding-top: max(0.5rem, env(safe-area-inset-top));
+  }
+  .sticker-shimmer {
+    background: linear-gradient(
+      110deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.18) 50%,
+      transparent 70%
+    );
+    background-size: 200% 100%;
+  }
 }
-
-/* Esconde scrollbar horizontal nas listas de chips */
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { scrollbar-width: none; }
