@@ -45,7 +45,8 @@ service cloud.firestore {
       // entre membros do mesmo grupo no plano Spark, sem Cloud Functions). Só o dono escreve.
       match /collection/{stickerId} {
         allow read: if isSignedIn();
-        allow write: if isOwner(userId)
+        allow delete: if isOwner(userId);
+        allow create, update: if isOwner(userId)
           && request.resource.data.quantity is int
           && request.resource.data.quantity >= 0;
       }
