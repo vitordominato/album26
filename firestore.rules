@@ -32,16 +32,19 @@ service cloud.firestore {
       allow write: if false;
     }
 
-    // Usuários: só o próprio dono lê/escreve seu perfil e coleção
+    // Usuários
     match /users/{userId} {
+      // Perfil é legível por qualquer autenticado (precisa pra mostrar nomes nos grupos)
       allow read: if isSignedIn();
       allow create: if isOwner(userId)
         && request.resource.data.keys().hasAll(['email', 'displayName', 'createdAt']);
       allow update: if isOwner(userId);
       allow delete: if isOwner(userId);
 
+      // Coleção: leitura aberta pra autenticados (necessário pro matching client-side
+      // entre membros do mesmo grupo no plano Spark, sem Cloud Functions). Só o dono escreve.
       match /collection/{stickerId} {
-        allow read: if isOwner(userId);
+        allow read: if isSignedIn();
         allow write: if isOwner(userId)
           && request.resource.data.quantity is int
           && request.resource.data.quantity >= 0;
@@ -56,7 +59,6 @@ service cloud.firestore {
         && request.resource.data.createdBy == request.auth.uid
         && request.auth.uid in request.resource.data.memberIds;
       allow update: if isGroupMember(groupId)
-        // só permite mexer em memberIds (entrar/sair) ou nome — nunca trocar criador/inviteCode
         && request.resource.data.createdBy == resource.data.createdBy
         && request.resource.data.inviteCode == resource.data.inviteCode;
       allow delete: if isSignedIn() && resource.data.createdBy == request.auth.uid;
@@ -86,19 +88,12 @@ service cloud.firestore {
       allow delete: if isSignedIn() && request.auth.uid == resource.data.fromUserId;
     }
 
-    // Notificações: só o dono lê
+    // Notificações in-app: só o dono lê/escreve
     match /notifications/{userId}/items/{notifId} {
       allow read: if isOwner(userId);
-      allow update: if isOwner(userId)
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
       allow delete: if isOwner(userId);
-      allow create: if false; // só via Cloud Functions (Admin SDK)
-    }
-
-    // Match suggestions calculadas pela Cloud Function (read-only para o usuário)
-    match /matches/{userId}/suggestions/{matchId} {
-      allow read: if isOwner(userId);
-      allow write: if false;
     }
   }
 }

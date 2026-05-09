@@ -1,11 +1,10 @@
-import { useMemo } from 'react';
 import { Sparkles, MessageCircle, Loader2 } from 'lucide-react';
 import { PageHeader } from '@/components/PageHeader';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useGroups } from '@/hooks/useGroups';
-import { useTrades, useMatchSuggestions } from '@/hooks/useTrades';
+import { useTrades, useMatchSuggestionsForGroup } from '@/hooks/useTrades';
 import { useUIStore } from '@/stores/ui';
 import { useAuthStore } from '@/stores/auth';
 import { dictionary } from '@/lib/i18n';
@@ -23,11 +22,7 @@ export default function Trades() {
   const groupId = activeGroupId ?? groups[0]?.id ?? null;
   const group = groups.find((g) => g.id === groupId) ?? null;
   const { trades, proposeTrade, updateStatus } = useTrades(groupId);
-  const suggestions = useMatchSuggestions();
-  const groupSuggestions = useMemo(
-    () => suggestions.filter((s) => s.groupId === groupId),
-    [suggestions, groupId]
-  );
+  const groupSuggestions = useMatchSuggestionsForGroup(groupId);
 
   if (loading) {
     return (

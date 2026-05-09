@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { Plus, Minus, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
-import type { Sticker } from '@/types';
+import type { ExtraTier, Sticker } from '@/types';
 
 interface Props {
   sticker: Sticker;
@@ -12,9 +12,41 @@ interface Props {
   compact?: boolean;
 }
 
+const EXTRA_TIER_BG: Record<ExtraTier, string> = {
+  regular: 'from-violet-700/70 to-violet-950/70 border-violet-400/60',
+  bronze: 'from-amber-700/80 to-amber-950/70 border-amber-500/70',
+  silver: 'from-slate-300/70 to-slate-600/70 border-slate-200/80',
+  gold: 'from-yellow-400/80 to-amber-700/70 border-yellow-300/90',
+};
+
+const EXTRA_TIER_LABEL: Record<ExtraTier, string> = {
+  regular: 'Regular',
+  bronze: 'Bronze',
+  silver: 'Prata',
+  gold: 'Ouro',
+};
+
 export function StickerCard({ sticker, quantity, onIncrement, onDecrement, compact }: Props) {
   const has = quantity > 0;
   const isDup = quantity > 1;
+  const isExtra = sticker.section === 'extras';
+  const extraTier = sticker.extraTier;
+
+  const borderClass = has
+    ? sticker.isMcDonalds
+      ? 'border-red-500'
+      : isExtra && extraTier
+        ? EXTRA_TIER_BG[extraTier].split(' ').filter((c) => c.startsWith('border')).join(' ')
+        : 'border-fifa-gold'
+    : 'border-dashed border-muted';
+
+  const bgClass = has
+    ? isExtra && extraTier
+      ? `bg-gradient-to-b ${EXTRA_TIER_BG[extraTier].split(' ').filter((c) => !c.startsWith('border')).join(' ')}`
+      : sticker.isMcDonalds
+        ? 'bg-gradient-to-b from-red-600/40 to-yellow-500/20'
+        : 'bg-gradient-to-b from-fifa-green/40 to-fifa-green/10'
+    : 'bg-muted/30';
 
   return (
     <motion.div
@@ -22,13 +54,14 @@ export function StickerCard({ sticker, quantity, onIncrement, onDecrement, compa
       whileTap={{ scale: 0.97 }}
       className={cn(
         'relative flex flex-col overflow-hidden rounded-lg border-2 transition-all',
-        has ? 'border-fifa-gold bg-card' : 'border-dashed border-muted bg-muted/30',
+        borderClass,
+        has ? 'bg-card' : '',
         compact ? 'aspect-[3/4]' : 'aspect-[3/4.4]'
       )}
     >
       <button
         type="button"
-        onClick={has ? onIncrement : onIncrement}
+        onClick={onIncrement}
         className="relative flex flex-1 items-center justify-center"
         aria-label={has ? `Adicionar mais ${sticker.code}` : `Coletei ${sticker.code}`}
       >
@@ -37,7 +70,7 @@ export function StickerCard({ sticker, quantity, onIncrement, onDecrement, compa
             initial={{ scale: 0.6, rotate: -8, opacity: 0 }}
             animate={{ scale: 1, rotate: 0, opacity: 1 }}
             transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-            className="flex h-full w-full flex-col items-center justify-center bg-gradient-to-b from-fifa-green/40 to-fifa-green/10 p-2 text-center"
+            className={cn('flex h-full w-full flex-col items-center justify-center p-2 text-center', bgClass)}
           >
             {sticker.imageUrl ? (
               <img
@@ -59,15 +92,36 @@ export function StickerCard({ sticker, quantity, onIncrement, onDecrement, compa
             )}
           </motion.div>
         ) : (
-          <span className="text-xs font-bold text-muted-foreground/70">{sticker.code}</span>
+          <span className="text-[10px] font-bold text-muted-foreground/70 px-1 text-center break-all">
+            {sticker.code}
+          </span>
         )}
       </button>
 
-      {isDup && (
-        <Badge
-          variant="gold"
-          className="absolute right-1 top-1 px-1.5 py-0 text-[10px]"
+      {/* badges sobre o card */}
+      {sticker.isMcDonalds && (
+        <span
+          title="Exclusivo McDonald's"
+          className="absolute left-1 top-1 grid h-5 w-5 place-items-center rounded-full bg-red-600 text-[10px] font-black text-yellow-300 shadow"
         >
+          M
+        </span>
+      )}
+      {isExtra && extraTier && (
+        <Badge
+          className={cn(
+            'absolute left-1 top-1 px-1.5 py-0 text-[9px]',
+            extraTier === 'gold' && 'bg-yellow-400 text-amber-900',
+            extraTier === 'silver' && 'bg-slate-200 text-slate-900',
+            extraTier === 'bronze' && 'bg-amber-700 text-amber-50',
+            extraTier === 'regular' && 'bg-violet-600 text-violet-50'
+          )}
+        >
+          {EXTRA_TIER_LABEL[extraTier]}
+        </Badge>
+      )}
+      {isDup && (
+        <Badge variant="gold" className="absolute right-1 top-1 px-1.5 py-0 text-[10px]">
           x{quantity}
         </Badge>
       )}
@@ -79,7 +133,7 @@ export function StickerCard({ sticker, quantity, onIncrement, onDecrement, compa
             e.stopPropagation();
             onDecrement();
           }}
-          className="absolute left-1 top-1 grid h-7 w-7 place-items-center rounded-full bg-card/80 text-muted-foreground hover:text-destructive"
+          className="absolute bottom-1 left-1 grid h-7 w-7 place-items-center rounded-full bg-card/80 text-muted-foreground hover:text-destructive"
           aria-label={`Diminuir ${sticker.code}`}
         >
           <Minus className="h-3.5 w-3.5" />
