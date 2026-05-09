@@ -2,7 +2,6 @@ import { Suspense, lazy, useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import { useFcm } from '@/hooks/useFcm';
 import { BottomNav } from '@/components/BottomNav';
 import { useUIStore } from '@/stores/ui';
 
@@ -26,7 +25,6 @@ function FullscreenLoader() {
 function ProtectedShell({ children }: { children: React.ReactNode }) {
   const { isSignedIn, profile, loading } = useAuth();
   const location = useLocation();
-  useFcm();
 
   if (loading) return <FullscreenLoader />;
   if (!isSignedIn) return <Navigate to="/login" replace state={{ from: location }} />;
