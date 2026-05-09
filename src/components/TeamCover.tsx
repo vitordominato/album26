@@ -1,3 +1,4 @@
+import { Crown } from 'lucide-react';
 import type { Team } from '@/types';
 
 export function TeamCover({ team }: { team: Team }) {
@@ -9,9 +10,14 @@ export function TeamCover({ team }: { team: Team }) {
         loading="lazy"
         className="h-10 w-14 rounded object-cover ring-1 ring-border"
       />
-      <div className="flex-1">
-        <p className="text-sm font-semibold leading-tight">{team.namePt}</p>
-        <p className="text-xs text-muted-foreground">{team.code} · {team.confederation}</p>
+      <div className="flex-1 min-w-0">
+        <p className="flex items-center gap-1 truncate text-sm font-semibold leading-tight">
+          {team.namePt}
+          {team.isHost && <Crown className="h-3 w-3 shrink-0 text-fifa-gold" />}
+        </p>
+        <p className="text-xs text-muted-foreground">
+          {team.code} · Grupo {team.groupStage}
+        </p>
       </div>
     </div>
   );

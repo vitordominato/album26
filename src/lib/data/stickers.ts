@@ -1,178 +1,120 @@
-import type { Sticker, StickerSection, Team } from '@/types';
+import type { ExtraTier, Sticker, StickerSection, Team } from '@/types';
 
 /**
- * Estrutura padrão Panini para Copa 2026:
- * - Capa/Abertura: 4 figurinhas (logo, mascote, troféu, bola)
- * - Países-sede: 3 (USA, MEX, CAN)
- * - Estádios: 16
- * - Lendas: 12
- * - 48 seleções × 18 figurinhas (escudo + foto + 18 jogadores + técnico = 20 por team page) = 960
- * - Brilhantes/Special: 30 capitães + 18 craques foil
- * - Fan Festival/Encerramento: 6
+ * Catálogo oficial Panini Copa do Mundo FIFA 2026:
  *
- * Os números seguem ordem: cover (1-4), hosts (5-7), stadiums (8-23),
- * legends (24-35), teams (36-995), special (996-1043), fanfest (1044-1049).
+ * - 19 FWC (FWC-1 a FWC-19) — abertura/destaque/ícones
+ * - 48 seleções × 20 figurinhas = 960
+ *   - posições por seleção (XYZ-N): 1=escudo, 2=foto da equipe,
+ *     3..19=jogadores, 20=técnico
+ *   - posição #13 de cada seleção é exclusiva McDonald's (rara)
+ * - 80 Extra Stickers — 20 estrelas × 4 versões (regular, bronze, prata, ouro)
  *
- * Total ≈ 670+ figurinhas. Ajuste o número de figurinhas por seleção (`PER_TEAM`)
- * conforme o catálogo oficial quando for divulgado.
+ * Total: 19 + 960 + 80 = 1.059 figurinhas.
  */
 
-export const STICKERS_PER_TEAM = 13; // escudo + foto + 11 jogadores (ajuste conforme catálogo oficial)
-export const COVER_COUNT = 4;
-export const HOSTS_COUNT = 3;
-export const STADIUMS_COUNT = 16;
-export const LEGENDS_COUNT = 12;
-export const SPECIAL_COUNT = 24;
-export const FANFEST_COUNT = 6;
+export const STICKERS_PER_TEAM = 20;
+export const FWC_COUNT = 19;
+export const EXTRA_PLAYERS = 20;
+export const EXTRA_TIERS: ExtraTier[] = ['regular', 'bronze', 'silver', 'gold'];
+export const MCDONALDS_SLOT = 13;
 
-interface SectionRange {
-  section: StickerSection;
-  start: number;
-  end: number;
+const SLOT_LABELS: Record<number, string | undefined> = {
+  1: 'Escudo',
+  2: 'Foto da equipe',
+  20: 'Técnico',
+};
+
+const EXTRA_TIER_PT: Record<ExtraTier, string> = {
+  regular: 'Regular',
+  bronze: 'Bronze',
+  silver: 'Prata',
+  gold: 'Ouro',
+};
+
+function pad2(n: number): string {
+  return n.toString().padStart(2, '0');
 }
 
 export function buildAllStickers(teams: Team[]): Sticker[] {
   const stickers: Sticker[] = [];
   let n = 1;
 
-  // Capa
-  const coverLabels = ['Logo Oficial', 'Mascote Trionda', 'Troféu FIFA', 'Bola Oficial'];
-  for (let i = 0; i < COVER_COUNT; i++) {
+  // 1) FWC (19 figurinhas, todas brilhantes)
+  for (let i = 1; i <= FWC_COUNT; i++) {
     stickers.push({
-      id: `FWC${n}`,
+      id: `FWC-${i}`,
       number: n,
-      code: `FWC${n}`,
-      type: 'cover',
-      section: 'cover',
-      isFoil: i === 2,
-      label: coverLabels[i],
-    });
-    n++;
-  }
-
-  // Países-sede
-  const hostCodes = ['USA', 'MEX', 'CAN'];
-  for (const code of hostCodes) {
-    stickers.push({
-      id: `FWC${n}`,
-      number: n,
-      code: `FWC${n}`,
-      type: 'host',
-      section: 'hosts',
-      teamId: code,
-      isFoil: false,
-      label: `Sede: ${code}`,
-    });
-    n++;
-  }
-
-  // Estádios
-  for (let i = 0; i < STADIUMS_COUNT; i++) {
-    stickers.push({
-      id: `FWC${n}`,
-      number: n,
-      code: `FWC${n}`,
-      type: 'stadium',
-      section: 'stadiums',
-      isFoil: false,
-      label: `Estádio ${i + 1}`,
-    });
-    n++;
-  }
-
-  // Lendas
-  for (let i = 0; i < LEGENDS_COUNT; i++) {
-    stickers.push({
-      id: `FWC${n}`,
-      number: n,
-      code: `FWC${n}`,
-      type: 'legend',
-      section: 'legends',
+      code: `FWC-${i}`,
+      type: 'fwc',
+      section: 'fwc',
       isFoil: true,
-      label: `Lenda ${i + 1}`,
+      label: `FWC ${i}`,
     });
     n++;
   }
 
-  // Seleções
+  // 2) Seleções (48 × 20)
   const sortedTeams = [...teams].sort((a, b) => a.order - b.order);
   for (const team of sortedTeams) {
-    // Escudo + foto da equipe
-    stickers.push({
-      id: `${team.code}1`,
-      number: n,
-      code: `${team.code}1`,
-      type: 'team',
-      section: 'team',
-      teamId: team.id,
-      isFoil: true,
-      label: `${team.namePt} — Escudo`,
-    });
-    n++;
-    stickers.push({
-      id: `${team.code}2`,
-      number: n,
-      code: `${team.code}2`,
-      type: 'team',
-      section: 'team',
-      teamId: team.id,
-      isFoil: false,
-      label: `${team.namePt} — Equipe`,
-    });
-    n++;
-
-    for (let i = 3; i <= STICKERS_PER_TEAM; i++) {
+    for (let slot = 1; slot <= STICKERS_PER_TEAM; slot++) {
+      const isMcDonalds = slot === MCDONALDS_SLOT;
+      const isFoil = slot === 1; // escudo brilhante (padrão Panini)
+      const slotLabel = SLOT_LABELS[slot] ?? `Jogador ${slot - 2}`;
       stickers.push({
-        id: `${team.code}${i}`,
+        id: `${team.code}-${slot}`,
         number: n,
-        code: `${team.code}${i}`,
-        type: 'player',
+        code: `${team.code}-${slot}`,
+        type: slot === 1 || slot === 2 ? 'team' : 'player',
         section: 'team',
         teamId: team.id,
-        isFoil: false,
-        label: `${team.namePt} — Jogador ${i - 2}`,
+        teamSlot: slot,
+        groupStage: team.groupStage,
+        isFoil,
+        isMcDonalds,
+        label: `${team.namePt} #${pad2(slot)} — ${slotLabel}${isMcDonalds ? ' (McDonald’s)' : ''}`,
       });
       n++;
     }
   }
 
-  // Brilhantes
-  for (let i = 0; i < SPECIAL_COUNT; i++) {
-    stickers.push({
-      id: `FWS${i + 1}`,
-      number: n,
-      code: `FWS${i + 1}`,
-      type: 'special',
-      section: 'special',
-      isFoil: true,
-      label: `Special ${i + 1}`,
-    });
-    n++;
-  }
-
-  // Fan Festival
-  for (let i = 0; i < FANFEST_COUNT; i++) {
-    stickers.push({
-      id: `FWF${i + 1}`,
-      number: n,
-      code: `FWF${i + 1}`,
-      type: 'special',
-      section: 'fanfest',
-      isFoil: false,
-      label: `Fan Festival ${i + 1}`,
-    });
-    n++;
+  // 3) Extras (20 estrelas × 4 versões = 80)
+  for (let i = 1; i <= EXTRA_PLAYERS; i++) {
+    for (const tier of EXTRA_TIERS) {
+      stickers.push({
+        id: `EXTRA-${i}-${tier.toUpperCase()}`,
+        number: n,
+        code: `EXTRA-${i}-${tier.toUpperCase()}`,
+        type: 'extra',
+        section: 'extras',
+        isFoil: tier !== 'regular',
+        extraTier: tier,
+        label: `Estrela ${i} — ${EXTRA_TIER_PT[tier]}`,
+      });
+      n++;
+    }
   }
 
   return stickers;
 }
 
-export function sectionRange(stickers: Sticker[], section: StickerSection): SectionRange | null {
-  const filtered = stickers.filter((s) => s.section === section);
-  if (filtered.length === 0) return null;
-  return {
-    section,
-    start: filtered[0].number,
-    end: filtered[filtered.length - 1].number,
-  };
+export interface SectionRange {
+  section: StickerSection;
+  start: number;
+  end: number;
+  count: number;
+}
+
+export function sectionRanges(stickers: Sticker[]): Record<StickerSection, SectionRange> {
+  const result = {} as Record<StickerSection, SectionRange>;
+  for (const s of stickers) {
+    const r = result[s.section];
+    if (!r) {
+      result[s.section] = { section: s.section, start: s.number, end: s.number, count: 1 };
+    } else {
+      r.end = Math.max(r.end, s.number);
+      r.count++;
+    }
+  }
+  return result;
 }

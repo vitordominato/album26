@@ -4,16 +4,11 @@ export type FsTimestamp = Timestamp | Date | FieldValue;
 
 export type Confederation = 'CONMEBOL' | 'UEFA' | 'CONCACAF' | 'AFC' | 'CAF' | 'OFC';
 
-export type StickerSection =
-  | 'cover'
-  | 'hosts'
-  | 'stadiums'
-  | 'legends'
-  | 'team'
-  | 'special'
-  | 'fanfest';
+export type StickerSection = 'fwc' | 'team' | 'extras';
 
-export type StickerType = 'player' | 'team' | 'legend' | 'special' | 'host' | 'stadium' | 'cover';
+export type StickerType = 'player' | 'team' | 'special' | 'fwc' | 'extra';
+
+export type ExtraTier = 'regular' | 'bronze' | 'silver' | 'gold';
 
 export interface UserProfile {
   uid: string;
@@ -40,11 +35,11 @@ export interface Team {
   nameEn: string;
   nameEs: string;
   flagUrl: string;
-  groupStage?: string; // 'A', 'B', ...
+  groupStage: string; // 'A' a 'L'
   confederation: Confederation;
   isHost: boolean;
   coachName?: string;
-  order: number; // ordem na seção
+  order: number;
 }
 
 export interface Player {
@@ -57,14 +52,18 @@ export interface Player {
 }
 
 export interface Sticker {
-  id: string; // ex: "FWC1", "BRA1"
-  number: number;
-  code: string;
+  id: string; // ex: "FWC-1", "BRA-13", "EXTRA-7-GOLD"
+  number: number; // posição absoluta no álbum
+  code: string; // ex: "FWC-1", "BRA-13", "EXTRA-7"
   type: StickerType;
   section: StickerSection;
   teamId?: string;
+  teamSlot?: number; // 1 a 20 dentro da página da seleção
   playerId?: string;
   isFoil: boolean;
+  isMcDonalds?: boolean; // #13 de cada seleção, exclusivo McDonald's
+  extraTier?: ExtraTier; // só para 'extras'
+  groupStage?: string; // grupo da copa quando aplicável
   imageUrl?: string;
   label?: string;
 }
