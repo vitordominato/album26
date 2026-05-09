@@ -7,6 +7,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { useStickers, useTeams } from '@/hooks/useTeams';
 import { useCollection } from '@/hooks/useCollection';
+import { AlbumContextPicker } from '@/components/AlbumContextPicker';
 import { whatsappShareUrl } from '@/lib/utils';
 
 export default function Missing() {
@@ -56,6 +57,7 @@ export default function Missing() {
   return (
     <>
       <PageHeader title="Faltam / Repetidas" subtitle={`${missing.length} faltando · ${dupes.length} repetidas`} />
+      <AlbumContextPicker />
       <Input
         placeholder="Buscar por código, jogador, seleção…"
         value={search}

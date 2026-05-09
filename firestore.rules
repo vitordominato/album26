@@ -81,6 +81,16 @@ service cloud.firestore {
         allow delete: if isOwner(userId)
           || get(/databases/$(database)/documents/groups/$(groupId)).data.createdBy == request.auth.uid;
       }
+
+      // Álbum compartilhado do grupo: qualquer membro lê e escreve.
+      // Permite que pai e filho coleem juntos no mesmo álbum.
+      match /collection/{stickerId} {
+        allow read: if isGroupMember(groupId);
+        allow delete: if isGroupMember(groupId);
+        allow create, update: if isGroupMember(groupId)
+          && request.resource.data.quantity is int
+          && request.resource.data.quantity >= 0;
+      }
     }
 
     // Trocas: leitura/escrita só pelas duas partes envolvidas

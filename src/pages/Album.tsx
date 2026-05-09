@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { StickerCard } from '@/components/StickerCard';
 import { useTeams, useStickers } from '@/hooks/useTeams';
 import { useCollection } from '@/hooks/useCollection';
+import { AlbumContextPicker } from '@/components/AlbumContextPicker';
 import { useUIStore } from '@/stores/ui';
 import { dictionary } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
@@ -96,6 +97,8 @@ export default function Album() {
           </Button>
         }
       />
+
+      <AlbumContextPicker />
 
       <div className="mb-4 rounded-xl border border-border bg-card p-4">
         <p className="mb-2 text-xs font-medium text-muted-foreground">Progresso geral</p>

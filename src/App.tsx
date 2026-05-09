@@ -13,6 +13,7 @@ const Trades = lazy(() => import('@/pages/Trades'));
 const Group = lazy(() => import('@/pages/Group'));
 const Profile = lazy(() => import('@/pages/Profile'));
 const Dashboard = lazy(() => import('@/pages/Dashboard'));
+const MemberAlbum = lazy(() => import('@/pages/MemberAlbum'));
 
 function FullscreenLoader() {
   return (
@@ -95,6 +96,14 @@ export default function App() {
           element={
             <ProtectedShell>
               <Dashboard />
+            </ProtectedShell>
+          }
+        />
+        <Route
+          path="/group/:groupId/member/:userId"
+          element={
+            <ProtectedShell>
+              <MemberAlbum />
             </ProtectedShell>
           }
         />

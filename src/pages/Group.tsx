@@ -1,10 +1,14 @@
 import { useState } from 'react';
-import { Plus, LogIn, Copy, Loader2, Crown } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Plus, LogIn, Copy, Loader2, Crown, ChevronRight } from 'lucide-react';
 import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Progress } from '@/components/ui/progress';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { useReadOnlyUserCollection } from '@/hooks/useCollection';
+import { useStickers } from '@/hooks/useTeams';
 import {
   Dialog,
   DialogContent,
@@ -177,32 +181,74 @@ export default function Group() {
           <h2 className="mb-2 text-sm font-semibold">Membros</h2>
           <ul className="space-y-2">
             {members.map((m) => (
-              <li
+              <MemberRow
                 key={m.userId}
-                className="flex items-center gap-3 rounded-xl border border-border bg-card p-3"
-              >
-                {m.photoURL ? (
-                  <img
-                    src={m.photoURL}
-                    alt=""
-                    className="h-10 w-10 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="grid h-10 w-10 place-items-center rounded-full bg-muted text-sm font-bold">
-                    {m.displayName.charAt(0).toUpperCase()}
-                  </div>
-                )}
-                <span className="flex-1 text-sm font-medium">{m.displayName}</span>
-                {m.role === 'owner' && (
-                  <Badge variant="gold" className="gap-1">
-                    <Crown className="h-3 w-3" /> dono
-                  </Badge>
-                )}
-              </li>
+                groupId={group.id}
+                userId={m.userId}
+                displayName={m.displayName}
+                photoURL={m.photoURL}
+                isOwner={m.role === 'owner'}
+              />
             ))}
           </ul>
         </>
       )}
     </>
+  );
+}
+
+function MemberRow({
+  groupId,
+  userId,
+  displayName,
+  photoURL,
+  isOwner,
+}: {
+  groupId: string;
+  userId: string;
+  displayName: string;
+  photoURL: string | null;
+  isOwner: boolean;
+}) {
+  const { entries } = useReadOnlyUserCollection(userId);
+  const { data: stickers } = useStickers();
+  const total = stickers?.length ?? 0;
+  const have = stickers
+    ? stickers.filter((s) => (entries[s.id]?.quantity ?? 0) > 0).length
+    : 0;
+  const pct = total > 0 ? Math.round((have / total) * 100) : 0;
+
+  return (
+    <li>
+      <Link
+        to={`/group/${groupId}/member/${userId}`}
+        className="flex items-center gap-3 rounded-xl border border-border bg-card p-3 transition hover:border-fifa-gold"
+      >
+        {photoURL ? (
+          <img src={photoURL} alt="" className="h-10 w-10 rounded-full object-cover" />
+        ) : (
+          <div className="grid h-10 w-10 place-items-center rounded-full bg-muted text-sm font-bold">
+            {displayName.charAt(0).toUpperCase()}
+          </div>
+        )}
+        <div className="flex-1 min-w-0">
+          <p className="flex items-center gap-2 truncate text-sm font-semibold">
+            {displayName}
+            {isOwner && (
+              <Badge variant="gold" className="gap-1">
+                <Crown className="h-3 w-3" /> dono
+              </Badge>
+            )}
+          </p>
+          <div className="mt-1 flex items-center gap-2">
+            <Progress value={pct} className="h-1.5 flex-1" />
+            <span className="shrink-0 text-[11px] font-mono text-muted-foreground">
+              {have}/{total} · <span className="text-fifa-gold">{pct}%</span>
+            </span>
+          </div>
+        </div>
+        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+      </Link>
+    </li>
   );
 }
