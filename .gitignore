@@ -6,6 +6,9 @@ functions/node_modules
 dist
 dist-ssr
 functions/lib
+*.tsbuildinfo
+vite.config.js
+vite.config.d.ts
 
 # env / secrets
 .env

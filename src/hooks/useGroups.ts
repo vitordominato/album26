@@ -116,3 +116,34 @@ export function useGroupMembers(groupId: string | null) {
   }, [groupId]);
   return members;
 }
+
+export function useMemberCollection(userId: string | null) {
+  const [entries, setEntries] = useState<Record<string, number>>({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!userId) {
+      setEntries({});
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    const ref = collection(db, 'users', userId, 'collection');
+    const unsub = onSnapshot(
+      ref,
+      (snap) => {
+        const next: Record<string, number> = {};
+        snap.forEach((d) => {
+          const data = d.data() as { quantity?: number };
+          next[d.id] = data.quantity ?? 0;
+        });
+        setEntries(next);
+        setLoading(false);
+      },
+      () => setLoading(false)
+    );
+    return unsub;
+  }, [userId]);
+
+  return { entries, loading };
+}
