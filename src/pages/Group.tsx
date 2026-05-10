@@ -27,7 +27,7 @@ type ListKind = 'missing' | 'dupes';
 type View =
   | { kind: 'members' }
   | { kind: 'member'; userId: string }
-  | { kind: 'team'; userId: string; teamId: string; list: ListKind };
+  | { kind: 'team'; userId: string; teamId: string };
 
 export default function Group() {
   const { groups, loading, createGroup, joinGroupByCode, leaveGroup } = useGroups();
@@ -245,13 +245,12 @@ function MemberView({
   setView,
 }: {
   member: { userId: string; displayName: string; photoURL: string | null };
-  view: { kind: 'member'; userId: string } | { kind: 'team'; userId: string; teamId: string; list: ListKind };
+  view: { kind: 'member'; userId: string } | { kind: 'team'; userId: string; teamId: string };
   setView: (v: View) => void;
 }) {
   const { data: stickers, isLoading: stickersLoading } = useStickers();
   const { data: teams, isLoading: teamsLoading } = useTeams();
   const { entries, loading: collLoading } = useMemberCollection(member.userId);
-  const [tab, setTab] = useState<ListKind>(view.kind === 'team' ? view.list : 'missing');
 
   const stickersByTeam = useMemo(() => {
     const map: Record<string, Sticker[]> = {};
@@ -283,45 +282,14 @@ function MemberView({
       setView({ kind: 'member', userId: member.userId });
       return null;
     }
-    const teamStickers = stickersByTeam[team.id] ?? [];
-    const filtered = filterByList(teamStickers, entries, view.list);
     return (
-      <>
-        <PageHeader
-          title={team.namePt}
-          subtitle={`${member.displayName} · ${view.list === 'missing' ? 'Faltantes' : 'Repetidas'} · ${filtered.length}`}
-          right={
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => setView({ kind: 'member', userId: member.userId })}
-            >
-              Voltar
-            </Button>
-          }
-        />
-        {filtered.length === 0 ? (
-          <p className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-            {view.list === 'missing'
-              ? 'Esse jogador completou essa seleção.'
-              : 'Nenhuma repetida dessa seleção.'}
-          </p>
-        ) : (
-          <ul className="divide-y divide-border rounded-xl border border-border bg-card">
-            {filtered.map((s) => (
-              <li key={s.id} className="flex items-center justify-between gap-3 px-4 py-3">
-                <div>
-                  <p className="text-sm font-semibold">{s.code}</p>
-                  <p className="text-xs text-muted-foreground">{s.label}</p>
-                </div>
-                {view.list === 'dupes' && (
-                  <Badge variant="gold">x{entries[s.id] ?? 0}</Badge>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
-      </>
+      <TeamView
+        team={team}
+        teamStickers={stickersByTeam[team.id] ?? []}
+        entries={entries}
+        memberName={member.displayName}
+        onBack={() => setView({ kind: 'member', userId: member.userId })}
+      />
     );
   }
 
@@ -345,35 +313,93 @@ function MemberView({
         }
       />
 
+      <FlagsByGroup
+        teamsByGroup={teamsByGroup}
+        stickersByTeam={stickersByTeam}
+        entries={entries}
+        onSelect={(teamId) =>
+          setView({ kind: 'team', userId: member.userId, teamId })
+        }
+      />
+    </>
+  );
+}
+
+function TeamView({
+  team,
+  teamStickers,
+  entries,
+  memberName,
+  onBack,
+}: {
+  team: Team;
+  teamStickers: Sticker[];
+  entries: Record<string, number>;
+  memberName: string;
+  onBack: () => void;
+}) {
+  const [tab, setTab] = useState<ListKind>('missing');
+  const missing = filterByList(teamStickers, entries, 'missing');
+  const dupes = filterByList(teamStickers, entries, 'dupes');
+
+  return (
+    <>
+      <PageHeader
+        title={team.namePt}
+        subtitle={`${memberName} · ${missing.length} faltando · ${dupes.length} repetidas`}
+        right={
+          <Button size="sm" variant="ghost" onClick={onBack}>
+            Voltar
+          </Button>
+        }
+      />
+
       <Tabs value={tab} onValueChange={(v) => setTab(v as ListKind)}>
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="missing">Faltam ({missingTotal})</TabsTrigger>
-          <TabsTrigger value="dupes">Repetidas ({dupesTotal})</TabsTrigger>
+          <TabsTrigger value="missing">Faltam ({missing.length})</TabsTrigger>
+          <TabsTrigger value="dupes">Repetidas ({dupes.length})</TabsTrigger>
         </TabsList>
         <TabsContent value="missing">
-          <FlagsByGroup
-            teamsByGroup={teamsByGroup}
-            stickersByTeam={stickersByTeam}
-            entries={entries}
-            list="missing"
-            onSelect={(teamId) =>
-              setView({ kind: 'team', userId: member.userId, teamId, list: 'missing' })
-            }
-          />
+          <StickerList stickers={missing} entries={entries} list="missing" />
         </TabsContent>
         <TabsContent value="dupes">
-          <FlagsByGroup
-            teamsByGroup={teamsByGroup}
-            stickersByTeam={stickersByTeam}
-            entries={entries}
-            list="dupes"
-            onSelect={(teamId) =>
-              setView({ kind: 'team', userId: member.userId, teamId, list: 'dupes' })
-            }
-          />
+          <StickerList stickers={dupes} entries={entries} list="dupes" />
         </TabsContent>
       </Tabs>
     </>
+  );
+}
+
+function StickerList({
+  stickers,
+  entries,
+  list,
+}: {
+  stickers: Sticker[];
+  entries: Record<string, number>;
+  list: ListKind;
+}) {
+  if (stickers.length === 0) {
+    return (
+      <p className="mt-3 rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+        {list === 'missing'
+          ? 'Esse jogador completou essa seleção.'
+          : 'Nenhuma repetida dessa seleção.'}
+      </p>
+    );
+  }
+  return (
+    <ul className="mt-3 divide-y divide-border rounded-xl border border-border bg-card">
+      {stickers.map((s) => (
+        <li key={s.id} className="flex items-center justify-between gap-3 px-4 py-3">
+          <div>
+            <p className="text-sm font-semibold">{s.code}</p>
+            <p className="text-xs text-muted-foreground">{s.label}</p>
+          </div>
+          {list === 'dupes' && <Badge variant="gold">x{entries[s.id] ?? 0}</Badge>}
+        </li>
+      ))}
+    </ul>
   );
 }
 
@@ -381,21 +407,23 @@ function FlagsByGroup({
   teamsByGroup,
   stickersByTeam,
   entries,
-  list,
   onSelect,
 }: {
   teamsByGroup: Record<string, Team[]>;
   stickersByTeam: Record<string, Sticker[]>;
   entries: Record<string, number>;
-  list: ListKind;
   onSelect: (teamId: string) => void;
 }) {
   const groups = Object.entries(teamsByGroup).sort(([a], [b]) => a.localeCompare(b));
   return (
     <div className="space-y-4">
       {groups.map(([groupStage, teamsInGroup]) => {
-        const groupCount = teamsInGroup.reduce(
-          (acc, tm) => acc + filterByList(stickersByTeam[tm.id] ?? [], entries, list).length,
+        const groupMissing = teamsInGroup.reduce(
+          (acc, tm) => acc + filterByList(stickersByTeam[tm.id] ?? [], entries, 'missing').length,
+          0
+        );
+        const groupDupes = teamsInGroup.reduce(
+          (acc, tm) => acc + filterByList(stickersByTeam[tm.id] ?? [], entries, 'dupes').length,
           0
         );
         return (
@@ -403,20 +431,17 @@ function FlagsByGroup({
             <div className="mb-2 flex items-baseline justify-between">
               <h3 className="text-sm font-bold">Grupo {groupStage}</h3>
               <span className="text-xs text-muted-foreground">
-                {groupCount} {list === 'missing' ? 'faltando' : 'repetidas'}
+                {groupMissing} faltam · {groupDupes} rep.
               </span>
             </div>
             <div className="grid grid-cols-2 gap-2">
               {teamsInGroup.map((team) => {
                 const ts = stickersByTeam[team.id] ?? [];
-                const teamCount = filterByList(ts, entries, list).length;
+                const missingCount = filterByList(ts, entries, 'missing').length;
+                const dupesCount = filterByList(ts, entries, 'dupes').length;
                 const total = ts.length;
-                const pct =
-                  total > 0
-                    ? list === 'missing'
-                      ? Math.round(((total - teamCount) / total) * 100)
-                      : Math.round((teamCount / total) * 100)
-                    : 0;
+                const haveCount = total - missingCount;
+                const pct = total > 0 ? Math.round((haveCount / total) * 100) : 0;
                 return (
                   <button
                     key={team.id}
@@ -441,21 +466,12 @@ function FlagsByGroup({
                       </div>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground">
-                        {list === 'missing'
-                          ? `${teamCount}/${total} faltam`
-                          : `${teamCount} repetidas`}
+                      <span className="font-semibold text-fifa-gold">
+                        {missingCount} {missingCount === 1 ? 'falta' : 'faltam'}
                       </span>
-                      <span
-                        className={cn(
-                          'font-semibold',
-                          list === 'missing' ? 'text-fifa-gold' : 'text-fifa-green'
-                        )}
-                      >
-                        {list === 'missing' ? `${pct}%` : `x${teamCount}`}
-                      </span>
+                      <span className="font-semibold text-fifa-green">x{dupesCount}</span>
                     </div>
-                    {list === 'missing' && <Progress value={pct} className="h-1.5" />}
+                    <Progress value={pct} className="h-1.5" />
                   </button>
                 );
               })}
