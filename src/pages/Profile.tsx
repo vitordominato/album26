@@ -1,4 +1,5 @@
-import { LogOut, Moon, Sun, Languages } from 'lucide-react';
+import { useState } from 'react';
+import { LogOut, Moon, Sun, Languages, RefreshCw } from 'lucide-react';
 import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -12,10 +13,28 @@ const LOCALES: { value: Locale; label: string }[] = [
   { value: 'es', label: 'Español' },
 ];
 
+async function hardRefresh() {
+  try {
+    if ('serviceWorker' in navigator) {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map((r) => r.unregister()));
+    }
+    if ('caches' in window) {
+      const keys = await caches.keys();
+      await Promise.all(keys.map((k) => caches.delete(k)));
+    }
+  } finally {
+    const url = new URL(window.location.href);
+    url.searchParams.set('_r', Date.now().toString());
+    window.location.replace(url.toString());
+  }
+}
+
 export default function Profile() {
   const { profile, signOut } = useAuth();
   const { theme, setTheme, locale, setLocale } = useUIStore();
   const t = dictionary[locale];
+  const [refreshing, setRefreshing] = useState(false);
 
   return (
     <>
@@ -73,6 +92,27 @@ export default function Profile() {
             ))}
           </div>
         </div>
+
+        <Button
+          variant="outline"
+          className="w-full justify-between"
+          disabled={refreshing}
+          onClick={async () => {
+            setRefreshing(true);
+            await hardRefresh();
+          }}
+        >
+          <span className="flex items-center gap-2">
+            <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+            Atualizar app
+          </span>
+          <span className="text-xs text-muted-foreground">
+            v{__APP_VERSION__}
+          </span>
+        </Button>
+        <p className="px-1 text-[11px] text-muted-foreground">
+          Limpa o cache e recarrega para buscar a versão mais nova.
+        </p>
       </div>
 
       <Button variant="outline" className="w-full text-destructive" onClick={signOut}>
