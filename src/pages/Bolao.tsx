@@ -76,6 +76,14 @@ export default function Bolao() {
     return () => clearInterval(id);
   }, []);
 
+  const myPoints = useMemo(() => {
+    let total = 0;
+    for (const [numStr, p] of Object.entries(myPicks)) {
+      total += pickPoints(p, scores[Number(numStr)]);
+    }
+    return total;
+  }, [myPicks, scores]);
+
   if (groupsLoading) {
     return (
       <div className="grid h-[60vh] place-items-center text-muted-foreground">
@@ -103,14 +111,6 @@ export default function Bolao() {
       </>
     );
   }
-
-  const myPoints = useMemo(() => {
-    let total = 0;
-    for (const [numStr, p] of Object.entries(myPicks)) {
-      total += pickPoints(p, scores[Number(numStr)]);
-    }
-    return total;
-  }, [myPicks, scores]);
 
   return (
     <>
