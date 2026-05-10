@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { Album, Search, ArrowLeftRight, Users, User } from 'lucide-react';
+import { Album, Search, ArrowLeftRight, Users, User, CalendarDays } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUIStore } from '@/stores/ui';
 import { dictionary } from '@/lib/i18n';
@@ -9,6 +9,7 @@ const items = [
   { to: '/missing', icon: Search, key: 'missing' },
   { to: '/trades', icon: ArrowLeftRight, key: 'trades' },
   { to: '/group', icon: Users, key: 'group' },
+  { to: '/matches', icon: CalendarDays, key: 'matches' },
   { to: '/profile', icon: User, key: 'profile' },
 ] as const;
 
@@ -31,7 +32,7 @@ export function BottomNav() {
             }
           >
             <Icon className="h-5 w-5" />
-            <span className="text-[11px] font-medium">{t[key]}</span>
+            <span className="text-[10px] font-medium">{t[key]}</span>
           </NavLink>
         ))}
       </div>

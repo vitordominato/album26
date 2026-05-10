@@ -8,6 +8,7 @@ export const dictionary = {
       missing: 'Faltam',
       trades: 'Trocas',
       group: 'Grupo',
+      matches: 'Jogos',
       profile: 'Perfil',
     },
     auth: {
@@ -73,6 +74,7 @@ export const dictionary = {
       missing: 'Missing',
       trades: 'Trades',
       group: 'Group',
+      matches: 'Matches',
       profile: 'Profile',
     },
     auth: {
@@ -134,6 +136,7 @@ export const dictionary = {
       missing: 'Faltan',
       trades: 'Cambios',
       group: 'Grupo',
+      matches: 'Partidos',
       profile: 'Perfil',
     },
     auth: {
