@@ -70,6 +70,18 @@ service cloud.firestore {
         allow delete: if isOwner(userId)
           || get(/databases/$(database)/documents/groups/$(groupId)).data.createdBy == request.auth.uid;
       }
+
+      // Placares dos jogos da Copa: qualquer membro do grupo lê e escreve.
+      match /matches/{matchNum} {
+        allow read: if isGroupMember(groupId);
+        allow create, update: if isGroupMember(groupId)
+          && request.resource.data.homeScore is int
+          && request.resource.data.awayScore is int
+          && request.resource.data.homeScore >= 0
+          && request.resource.data.awayScore >= 0
+          && request.resource.data.updatedBy == request.auth.uid;
+        allow delete: if isGroupMember(groupId);
+      }
     }
 
     // Trocas: leitura/escrita só pelas duas partes envolvidas

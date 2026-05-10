@@ -11,6 +11,7 @@ const Album = lazy(() => import('@/pages/Album'));
 const Missing = lazy(() => import('@/pages/Missing'));
 const Trades = lazy(() => import('@/pages/Trades'));
 const Group = lazy(() => import('@/pages/Group'));
+const Matches = lazy(() => import('@/pages/Matches'));
 const Profile = lazy(() => import('@/pages/Profile'));
 const Dashboard = lazy(() => import('@/pages/Dashboard'));
 
@@ -79,6 +80,14 @@ export default function App() {
           element={
             <ProtectedShell>
               <Group />
+            </ProtectedShell>
+          }
+        />
+        <Route
+          path="/matches"
+          element={
+            <ProtectedShell>
+              <Matches />
             </ProtectedShell>
           }
         />
