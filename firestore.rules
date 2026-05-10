@@ -82,6 +82,23 @@ service cloud.firestore {
           && request.resource.data.updatedBy == request.auth.uid;
         allow delete: if isGroupMember(groupId);
       }
+
+      // Palpites do bolão: cada membro lê/escreve só os próprios.
+      // Doc id = `${uid}_${matchNum}`. Membros do grupo veem todos pra calcular ranking.
+      match /picks/{pickId} {
+        allow read: if isGroupMember(groupId);
+        allow create, update: if isGroupMember(groupId)
+          && request.resource.data.uid == request.auth.uid
+          && request.resource.data.matchNum is int
+          && request.resource.data.matchNum >= 1
+          && request.resource.data.matchNum <= 104
+          && request.resource.data.homeScore is int
+          && request.resource.data.awayScore is int
+          && request.resource.data.homeScore >= 0
+          && request.resource.data.awayScore >= 0;
+        allow delete: if isSignedIn()
+          && resource.data.uid == request.auth.uid;
+      }
     }
 
     // Trocas: leitura/escrita só pelas duas partes envolvidas

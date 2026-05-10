@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
-import { Plus, LogIn, Copy, Loader2, Crown, ChevronRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Plus, LogIn, Copy, Loader2, Crown, ChevronRight, Trophy } from 'lucide-react';
 import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -201,6 +202,20 @@ export default function Group() {
               </Button>
             </CardContent>
           </Card>
+
+          <Button
+            asChild
+            size="lg"
+            className="mb-4 w-full justify-between bg-gradient-to-br from-fifa-gold/30 to-fifa-green/30 text-foreground hover:from-fifa-gold/40 hover:to-fifa-green/40"
+          >
+            <Link to="/bolao">
+              <span className="flex items-center gap-2">
+                <Trophy className="h-5 w-5 text-fifa-gold" />
+                <span className="font-bold">Abrir bolão</span>
+              </span>
+              <ChevronRight className="h-5 w-5" />
+            </Link>
+          </Button>
 
           <h2 className="mb-2 text-sm font-semibold">Membros</h2>
           <ul className="space-y-2">
