@@ -30,7 +30,6 @@ export const dictionary = {
       fwc: 'FWC (Abertura)',
       team: 'Seleções',
       extras: 'Extras (Estrelas)',
-      mcdonalds: 'McDonald’s',
     },
     confederations: {
       CONMEBOL: 'América do Sul',
@@ -92,7 +91,6 @@ export const dictionary = {
       fwc: 'FWC (Opening)',
       team: 'Teams',
       extras: 'Extras (Stars)',
-      mcdonalds: 'McDonald’s',
     },
     confederations: {
       CONMEBOL: 'South America',
@@ -154,7 +152,6 @@ export const dictionary = {
       fwc: 'FWC (Apertura)',
       team: 'Selecciones',
       extras: 'Extras (Estrellas)',
-      mcdonalds: 'McDonald’s',
     },
     confederations: {
       CONMEBOL: 'Sudamérica',

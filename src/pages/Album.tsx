@@ -73,7 +73,7 @@ export default function Album() {
   if (view.kind === 'section') {
     return (
       <SectionGrid
-        title={t.sections[view.section as 'fwc' | 'team' | 'extras' | 'mcdonalds']}
+        title={t.sections[view.section]}
         stickers={stickersBySection[view.section] ?? []}
         onBack={() => setView({ kind: 'home' })}
       />
