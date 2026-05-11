@@ -33,19 +33,15 @@ export function StickerCard({ sticker, quantity, onIncrement, onDecrement, compa
   const extraTier = sticker.extraTier;
 
   const borderClass = has
-    ? sticker.isMcDonalds
-      ? 'border-red-500'
-      : isExtra && extraTier
-        ? EXTRA_TIER_BG[extraTier].split(' ').filter((c) => c.startsWith('border')).join(' ')
-        : 'border-fifa-gold'
+    ? isExtra && extraTier
+      ? EXTRA_TIER_BG[extraTier].split(' ').filter((c) => c.startsWith('border')).join(' ')
+      : 'border-fifa-gold'
     : 'border-dashed border-muted';
 
   const bgClass = has
     ? isExtra && extraTier
       ? `bg-gradient-to-b ${EXTRA_TIER_BG[extraTier].split(' ').filter((c) => !c.startsWith('border')).join(' ')}`
-      : sticker.isMcDonalds
-        ? 'bg-gradient-to-b from-red-600/40 to-yellow-500/20'
-        : 'bg-gradient-to-b from-fifa-green/40 to-fifa-green/10'
+      : 'bg-gradient-to-b from-fifa-green/40 to-fifa-green/10'
     : 'bg-muted/30';
 
   return (
@@ -99,14 +95,6 @@ export function StickerCard({ sticker, quantity, onIncrement, onDecrement, compa
       </button>
 
       {/* badges sobre o card */}
-      {sticker.isMcDonalds && (
-        <span
-          title="Exclusivo McDonald's"
-          className="absolute left-1 top-1 grid h-5 w-5 place-items-center rounded-full bg-red-600 text-[10px] font-black text-yellow-300 shadow"
-        >
-          M
-        </span>
-      )}
       {isExtra && extraTier && (
         <Badge
           className={cn(

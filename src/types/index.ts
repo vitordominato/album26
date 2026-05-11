@@ -61,7 +61,7 @@ export interface Sticker {
   teamSlot?: number; // 1 a 20 dentro da página da seleção
   playerId?: string;
   isFoil: boolean;
-  isMcDonalds?: boolean; // #13 de cada seleção, exclusivo McDonald's
+  isMcDonalds?: boolean; // legado Copa 2022; sempre false em 2026, mantido pra coleções históricas
   extraTier?: ExtraTier; // só para 'extras'
   groupStage?: string; // grupo da copa quando aplicável
   imageUrl?: string;

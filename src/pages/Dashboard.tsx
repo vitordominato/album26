@@ -43,10 +43,6 @@ export default function Dashboard() {
       return { name: t.sections[sec], total: list.length, have: got };
     });
 
-    const mcdsList = stickers.filter((s) => s.isMcDonalds);
-    const mcdsHave = mcdsList.filter((s) => (entries[s.id]?.quantity ?? 0) > 0).length;
-    sectionData.push({ name: t.sections.mcdonalds, total: mcdsList.length, have: mcdsHave });
-
     const groupData = GROUP_LETTERS.map((g) => {
       const teamIds = teams.filter((tm) => tm.groupStage === g).map((tm) => tm.id);
       const list = stickers.filter((s) => s.teamId && teamIds.includes(s.teamId));
