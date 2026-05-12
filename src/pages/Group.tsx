@@ -132,7 +132,7 @@ export default function Group() {
               placeholder="ABCDEF"
               maxLength={6}
               value={code}
-              onChange={(e) => setCode(e.target.value.toUpperCase())}
+              onChange={(e) => setCode(e.target.value.replace(/\s+/g, '').toUpperCase())}
               className="font-mono uppercase tracking-widest"
             />
             {err && <p className="text-sm text-destructive">{err}</p>}
