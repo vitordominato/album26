@@ -45,11 +45,34 @@ export default function Missing() {
   }
 
   function shareList(list: typeof missing, title: string) {
-    const lines = list
-      .slice(0, 50)
-      .map((s) => `${s.code}${s.label ? ` (${s.label})` : ''}`)
+    const sectionLabel: Record<string, string> = {
+      fwc: 'FIFA World Cup',
+      extras: 'Extras',
+      team: 'Outras',
+    };
+    const groups = new Map<string, { label: string; order: number; items: typeof list }>();
+    list.forEach((s) => {
+      const key = s.teamId ?? `__${s.section}`;
+      const label = s.teamId
+        ? teamsById[s.teamId] ?? s.teamId
+        : sectionLabel[s.section] ?? s.section;
+      const order = s.teamId ? 0 : s.section === 'fwc' ? 1 : 2;
+      if (!groups.has(key)) groups.set(key, { label, order, items: [] });
+      groups.get(key)!.items.push(s);
+    });
+    const slotOf = (s: typeof list[number]) => s.teamSlot ?? s.number;
+    const lines = Array.from(groups.values())
+      .sort((a, b) => a.order - b.order || a.label.localeCompare(b.label, 'pt-BR'))
+      .map((g) => {
+        const nums = g.items
+          .slice()
+          .sort((a, b) => slotOf(a) - slotOf(b))
+          .map(slotOf)
+          .join(', ');
+        return `${g.label} — ${nums}`;
+      })
       .join('\n');
-    const text = `${title} — Álbum Copa 2026:\n\n${lines}${list.length > 50 ? `\n+${list.length - 50}…` : ''}`;
+    const text = `${title} — Álbum Copa 2026 (${list.length}):\n\n${lines}`;
     window.open(whatsappShareUrl(text), '_blank');
   }
 
