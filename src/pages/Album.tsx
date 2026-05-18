@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Loader2, ChevronRight, BarChart3, Sparkles, Star } from 'lucide-react';
+import { CocaColaIcon } from '@/components/icons/CocaColaIcon';
 import { Link } from 'react-router-dom';
 import { PageHeader } from '@/components/PageHeader';
 import { TeamCover } from '@/components/TeamCover';
@@ -36,7 +37,7 @@ export default function Album() {
   }, [stickers]);
 
   const stickersBySection = useMemo(() => {
-    const map: Record<string, Sticker[]> = { fwc: [], team: [], extras: [] };
+    const map: Record<string, Sticker[]> = { fwc: [], team: [], extras: [], cocacola: [] };
     stickers?.forEach((s) => (map[s.section] ??= []).push(s));
     return map;
   }, [stickers]);
@@ -84,6 +85,8 @@ export default function Album() {
   const fwcHave = stickersBySection.fwc.filter((s) => (entries[s.id]?.quantity ?? 0) > 0).length;
   const exCount = stickersBySection.extras.length;
   const exHave = stickersBySection.extras.filter((s) => (entries[s.id]?.quantity ?? 0) > 0).length;
+  const ccCount = stickersBySection.cocacola.length;
+  const ccHave = stickersBySection.cocacola.filter((s) => (entries[s.id]?.quantity ?? 0) > 0).length;
 
   return (
     <>
@@ -103,7 +106,7 @@ export default function Album() {
         <p className="mt-2 text-2xl font-black text-fifa-gold">{pct}%</p>
       </div>
 
-      {/* Seções especiais (FWC / Extras) */}
+      {/* Seções especiais (FWC / Extras / Coca-Cola) */}
       <div className="mb-4 grid grid-cols-2 gap-2">
         <SectionTile
           icon={<Sparkles className="h-4 w-4" />}
@@ -120,6 +123,14 @@ export default function Album() {
           total={exCount}
           onClick={() => setView({ kind: 'section', section: 'extras' })}
           accent="bg-gradient-to-br from-violet-700/30 to-yellow-400/30"
+        />
+        <SectionTile
+          icon={<CocaColaIcon className="h-4 w-4" />}
+          title={t.sections.cocacola}
+          have={ccHave}
+          total={ccCount}
+          onClick={() => setView({ kind: 'section', section: 'cocacola' })}
+          accent="bg-gradient-to-br from-red-600/40 to-red-900/40"
         />
       </div>
 

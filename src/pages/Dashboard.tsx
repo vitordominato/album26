@@ -36,7 +36,7 @@ export default function Dashboard() {
     const dupes = Object.values(entries).reduce((acc, e) => acc + Math.max(0, e.quantity - 1), 0);
 
     const sectionData: Array<{ name: string; total: number; have: number }> = (
-      ['fwc', 'team', 'extras'] as const
+      ['fwc', 'team', 'cocacola', 'extras'] as const
     ).map((sec) => {
       const list = stickers.filter((s) => s.section === sec);
       const got = list.filter((s) => (entries[s.id]?.quantity ?? 0) > 0).length;

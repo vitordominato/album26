@@ -4,9 +4,9 @@ export type FsTimestamp = Timestamp | Date | FieldValue;
 
 export type Confederation = 'CONMEBOL' | 'UEFA' | 'CONCACAF' | 'AFC' | 'CAF' | 'OFC';
 
-export type StickerSection = 'fwc' | 'team' | 'extras';
+export type StickerSection = 'fwc' | 'team' | 'extras' | 'cocacola';
 
-export type StickerType = 'player' | 'team' | 'special' | 'fwc' | 'extra';
+export type StickerType = 'player' | 'team' | 'special' | 'fwc' | 'extra' | 'cocacola';
 
 export type ExtraTier = 'regular' | 'bronze' | 'silver' | 'gold';
 

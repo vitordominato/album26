@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { Plus, Minus, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import { CocaColaIcon } from '@/components/icons/CocaColaIcon';
 import type { ExtraTier, Sticker } from '@/types';
 
 interface Props {
@@ -30,19 +31,28 @@ export function StickerCard({ sticker, quantity, onIncrement, onDecrement, compa
   const has = quantity > 0;
   const isDup = quantity > 1;
   const isExtra = sticker.section === 'extras';
+  const isCocaCola = sticker.section === 'cocacola';
   const extraTier = sticker.extraTier;
 
   const borderClass = has
     ? isExtra && extraTier
       ? EXTRA_TIER_BG[extraTier].split(' ').filter((c) => c.startsWith('border')).join(' ')
-      : 'border-fifa-gold'
-    : 'border-dashed border-muted';
+      : isCocaCola
+        ? 'border-red-500'
+        : 'border-fifa-gold'
+    : isCocaCola
+      ? 'border-dashed border-red-500/40'
+      : 'border-dashed border-muted';
 
   const bgClass = has
     ? isExtra && extraTier
       ? `bg-gradient-to-b ${EXTRA_TIER_BG[extraTier].split(' ').filter((c) => !c.startsWith('border')).join(' ')}`
-      : 'bg-gradient-to-b from-fifa-green/40 to-fifa-green/10'
-    : 'bg-muted/30';
+      : isCocaCola
+        ? 'bg-gradient-to-b from-red-600/70 to-red-900/60'
+        : 'bg-gradient-to-b from-fifa-green/40 to-fifa-green/10'
+    : isCocaCola
+      ? 'bg-red-950/20'
+      : 'bg-muted/30';
 
   return (
     <motion.div
@@ -95,6 +105,12 @@ export function StickerCard({ sticker, quantity, onIncrement, onDecrement, compa
       </button>
 
       {/* badges sobre o card */}
+      {isCocaCola && (
+        <Badge className="absolute left-1 top-1 gap-1 bg-red-600 px-1.5 py-0 text-[9px] text-white">
+          <CocaColaIcon className="h-2.5 w-2.5" />
+          Coca-Cola
+        </Badge>
+      )}
       {isExtra && extraTier && (
         <Badge
           className={cn(
