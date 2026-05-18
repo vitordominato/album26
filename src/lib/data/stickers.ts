@@ -1,5 +1,6 @@
 import type { ExtraTier, Sticker, StickerSection, Team } from '@/types';
 import {
+  COCA_COLA_PLAYERS_DATA,
   EXTRA_PLAYERS_DATA,
   FWC_COUNT,
   FWC_TITLES,
@@ -17,9 +18,10 @@ import {
  *   - slot 2-12  → jogadores 1 a 11
  *   - slot 13    → foto da seleção
  *   - slot 14-20 → jogadores 12 a 18
+ * - 14 Coca-Cola (CC1 a CC14) — espaço patrocinado oficial, todas foil
  * - 80 Extra Stickers — 20 craques × 4 versões (regular, bronze, prata, ouro)
  *
- * Total: 20 + 960 + 80 = 1.060 figurinhas (980 do álbum + 80 extras).
+ * Total: 20 + 960 + 14 + 80 = 1.074 figurinhas (994 do álbum + 80 extras).
  *
  * Importante: os IDs (`BRA-13`, `FWC-1`, `EXTRA-3-GOLD`, etc.) são estáveis
  * em relação à versão anterior do catálogo, então coleções já registradas
@@ -32,6 +34,7 @@ export const STICKERS_PER_TEAM = 20;
 export { FWC_COUNT };
 export const EXTRA_PLAYERS = EXTRA_PLAYERS_DATA.length;
 export const EXTRA_TIERS: ExtraTier[] = ['regular', 'bronze', 'silver', 'gold'];
+export const COCA_COLA_COUNT = COCA_COLA_PLAYERS_DATA.length;
 
 const TEAM_PHOTO_SLOT = 13;
 
@@ -115,7 +118,23 @@ export function buildAllStickers(teams: Team[]): Sticker[] {
     }
   }
 
-  // 3) Extras (20 craques × 4 versões = 80)
+  // 3) Coca-Cola (CC1..CC14, todas foil)
+  for (let i = 0; i < COCA_COLA_PLAYERS_DATA.length; i++) {
+    const cc = COCA_COLA_PLAYERS_DATA[i];
+    const code = `CC-${i + 1}`;
+    stickers.push({
+      id: code,
+      number: n,
+      code,
+      type: 'cocacola',
+      section: 'cocacola',
+      isFoil: true,
+      label: `${cc.player} (${cc.team})`,
+    });
+    n++;
+  }
+
+  // 4) Extras (20 craques × 4 versões = 80)
   for (let i = 0; i < EXTRA_PLAYERS_DATA.length; i++) {
     const craque = EXTRA_PLAYERS_DATA[i];
     for (const tier of EXTRA_TIERS) {

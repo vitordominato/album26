@@ -440,3 +440,102 @@ export const EXTRA_PLAYERS_DATA: Array<{ player: string; team: string }> = [
 
 export const PLAYERS_PER_TEAM = 18;
 export const FWC_COUNT = 20;
+
+/**
+ * Espaço Coca-Cola — patrocinador oficial da FIFA World Cup 26™.
+ * 14 figurinhas (CC1..CC14) com craques selecionados pela Coca-Cola,
+ * todas foil e fora do agrupamento das seleções.
+ */
+export const COCA_COLA_PLAYERS_DATA: Array<{
+  player: string;
+  team: string;
+  teamCode: string;
+  bio: string;
+}> = [
+  {
+    player: 'Lamine Yamal',
+    team: 'Espanha',
+    teamCode: 'ESP',
+    bio: 'Realizando o sonho de defender a seleção, ele vibrou ao se tornar o mais jovem artilheiro da história da Espanha, com apenas 16 anos.',
+  },
+  {
+    player: 'Joshua Kimmich',
+    team: 'Alemanha',
+    teamCode: 'GER',
+    bio: 'Marcado pela dor recente na FIFA World Cup™, o capitão quer devolver o orgulho à Alemanha, tetracampeã.',
+  },
+  {
+    player: 'Harry Kane',
+    team: 'Inglaterra',
+    teamCode: 'ENG',
+    bio: 'O capitão e provável artilheiro da Inglaterra quer repetir o feito da Chuteira de Ouro na FIFA World Cup 2018™.',
+  },
+  {
+    player: 'Santiago Giménez',
+    team: 'México',
+    teamCode: 'MEX',
+    bio: 'Após ficar fora da lista da FIFA World Cup 2022™, o atacante está com tudo para ter um papel-chave pelo México em 2026.',
+  },
+  {
+    player: 'Joško Gvardiol',
+    team: 'Croácia',
+    teamCode: 'CRO',
+    bio: 'Após uma dura derrota na semifinal, o zagueiro reagiu e inspirou a Croácia a conquistar o bronze na FIFA World Cup 2022™.',
+  },
+  {
+    player: 'Federico Valverde',
+    team: 'Uruguai',
+    teamCode: 'URU',
+    bio: 'Impulsionado pela turbulência emocional após a queda na FIFA World Cup 2022™, o meia se transformou na estrela do Uruguai.',
+  },
+  {
+    player: 'Jefferson Lerma',
+    team: 'Colômbia',
+    teamCode: 'COL',
+    bio: 'Depois de a Colômbia ficar fora da FIFA World Cup 2022™, o meia está decidido a liderar a retomada em 2026.',
+  },
+  {
+    player: 'Enner Valencia',
+    team: 'Equador',
+    teamCode: 'ECU',
+    bio: 'O recordista de gols do Equador em FIFA World Cups™ mira mais alto: chegar ao mata-mata no terceiro torneio.',
+  },
+  {
+    player: 'Gabriel Magalhães',
+    team: 'Brasil',
+    teamCode: 'BRA',
+    bio: 'Movido pelo legado do Brasil, o zagueiro quer acabar com a espera de 24 anos pelo sexto Troféu da FIFA World Cup™.',
+  },
+  {
+    player: 'Virgil van Dijk',
+    team: 'Holanda',
+    teamCode: 'NED',
+    bio: 'O capitão espera deixar para trás as lembranças da derrota da Holanda nos pênaltis na FIFA World Cup 2022™, e lutar pelo troféu.',
+  },
+  {
+    player: 'Alphonso Davies',
+    team: 'Canadá',
+    teamCode: 'CAN',
+    bio: 'Depois de se mudar para o Canadá ainda criança, ele se emocionou ao marcar, em 2022, o primeiro gol do país em uma FIFA World Cup™.',
+  },
+  {
+    player: 'Emiliano Martínez',
+    team: 'Argentina',
+    teamCode: 'ARG',
+    bio: 'O goleiro manteve a calma sob pressão, e suas defesas heroicas na disputa de pênaltis garantiram o título da FIFA World Cup 2022™ para a Argentina.',
+  },
+  {
+    player: 'Raúl Jiménez',
+    team: 'México',
+    teamCode: 'MEX',
+    bio: 'O atacante do México está louco para deixar sua marca: fazer seu primeiro gol no quarto torneio da FIFA World Cup™.',
+  },
+  {
+    player: 'Lautaro Martínez',
+    team: 'Argentina',
+    teamCode: 'ARG',
+    bio: 'Mesmo sem começar jogando, ele deu a volta por cima e fez o pênalti que levou a Argentina à semifinal da FIFA World Cup 2022™.',
+  },
+];
+
+export const COCA_COLA_COUNT = COCA_COLA_PLAYERS_DATA.length;

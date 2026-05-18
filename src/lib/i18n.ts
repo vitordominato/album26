@@ -30,6 +30,7 @@ export const dictionary = {
       fwc: 'FWC (Abertura)',
       team: 'Seleções',
       extras: 'Extras (Estrelas)',
+      cocacola: 'Coca-Cola',
     },
     confederations: {
       CONMEBOL: 'América do Sul',
@@ -91,6 +92,7 @@ export const dictionary = {
       fwc: 'FWC (Opening)',
       team: 'Teams',
       extras: 'Extras (Stars)',
+      cocacola: 'Coca-Cola',
     },
     confederations: {
       CONMEBOL: 'South America',
@@ -152,6 +154,7 @@ export const dictionary = {
       fwc: 'FWC (Apertura)',
       team: 'Selecciones',
       extras: 'Extras (Estrellas)',
+      cocacola: 'Coca-Cola',
     },
     confederations: {
       CONMEBOL: 'Sudamérica',

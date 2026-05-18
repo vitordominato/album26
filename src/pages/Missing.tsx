@@ -47,8 +47,15 @@ export default function Missing() {
   function shareList(list: typeof missing, title: string) {
     const sectionLabel: Record<string, string> = {
       fwc: 'FIFA World Cup',
+      cocacola: 'Coca-Cola',
       extras: 'Extras',
       team: 'Outras',
+    };
+    const sectionOrder: Record<string, number> = {
+      fwc: 1,
+      cocacola: 2,
+      extras: 3,
+      team: 4,
     };
     const groups = new Map<string, { label: string; order: number; items: typeof list }>();
     list.forEach((s) => {
@@ -56,7 +63,7 @@ export default function Missing() {
       const label = s.teamId
         ? teamsById[s.teamId] ?? s.teamId
         : sectionLabel[s.section] ?? s.section;
-      const order = s.teamId ? 0 : s.section === 'fwc' ? 1 : 2;
+      const order = s.teamId ? 0 : sectionOrder[s.section] ?? 99;
       if (!groups.has(key)) groups.set(key, { label, order, items: [] });
       groups.get(key)!.items.push(s);
     });
