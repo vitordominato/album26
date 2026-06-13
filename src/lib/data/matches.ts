@@ -62,21 +62,21 @@ export const MATCHES_2026: Match2026[] = [
   { num: 21, stage: 'group', group: 'K', date: '2026-06-17', time: '14:00', location: 'EUA / México (Grupo K)',                  home: t('POR'), away: t('COD') },
   { num: 22, stage: 'group', group: 'L', date: '2026-06-17', time: '17:00', location: 'EUA / Canadá (Grupo L)',                  home: t('ENG'), away: t('CRO') },
   { num: 23, stage: 'group', group: 'L', date: '2026-06-17', time: '20:00', location: 'EUA / Canadá (Grupo L)',                  home: t('GHA'), away: t('PAN') },
-  { num: 24, stage: 'group', group: 'K', date: '2026-06-17', time: '21:00', location: 'EUA / México (Grupo K)',                  home: t('UZB'), away: t('COL') },
+  { num: 24, stage: 'group', group: 'K', date: '2026-06-17', time: '23:00', location: 'EUA / México (Grupo K)',                  home: t('UZB'), away: t('COL') },
 
   // 2ª rodada
   { num: 25, stage: 'group', group: 'A', date: '2026-06-18', time: '13:00', location: 'México (Grupo A)',                         home: t('CZE'), away: t('RSA') },
   { num: 26, stage: 'group', group: 'B', date: '2026-06-18', time: '16:00', location: 'Canadá / EUA (Grupo B)',                  home: t('SUI'), away: t('BIH') },
   { num: 27, stage: 'group', group: 'B', date: '2026-06-18', time: '19:00', location: 'BC Place, Vancouver (CAN)',                home: t('CAN'), away: t('QAT') },
   { num: 28, stage: 'group', group: 'A', date: '2026-06-18', time: '22:00', location: 'México (Grupo A)',                         home: t('MEX'), away: t('KOR') },
-  { num: 29, stage: 'group', group: 'D', date: '2026-06-19', time: '00:00', location: 'Costa Oeste EUA / Canadá (Grupo D)',      home: t('TUR'), away: t('PAR') },
+  { num: 29, stage: 'group', group: 'D', date: '2026-06-20', time: '01:00', location: 'Costa Oeste EUA / Canadá (Grupo D)',      home: t('TUR'), away: t('PAR') },
   { num: 30, stage: 'group', group: 'D', date: '2026-06-19', time: '16:00', location: 'Lumen Field, Seattle (EUA)',               home: t('USA'), away: t('AUS') },
   { num: 31, stage: 'group', group: 'C', date: '2026-06-19', time: '19:00', location: 'Costa Leste dos EUA (Grupo C)',           home: t('SCO'), away: t('MAR') },
   { num: 32, stage: 'group', group: 'C', date: '2026-06-19', time: '21:30', location: 'Lincoln Financial Field, Filadélfia (EUA)', home: t('BRA'), away: t('HAI') },
   { num: 33, stage: 'group', group: 'F', date: '2026-06-20', time: '14:00', location: 'EUA / México (Grupo F)',                  home: t('NED'), away: t('SWE') },
   { num: 34, stage: 'group', group: 'E', date: '2026-06-20', time: '17:00', location: 'EUA / Canadá (Grupo E)',                  home: t('GER'), away: t('CIV') },
   { num: 35, stage: 'group', group: 'E', date: '2026-06-20', time: '21:00', location: 'EUA / Canadá (Grupo E)',                  home: t('ECU'), away: t('CUW') },
-  { num: 36, stage: 'group', group: 'F', date: '2026-06-20', time: '23:00', location: 'EUA / México (Grupo F)',                  home: t('TUN'), away: t('JPN') },
+  { num: 36, stage: 'group', group: 'F', date: '2026-06-21', time: '01:00', location: 'EUA / México (Grupo F)',                  home: t('TUN'), away: t('JPN') },
   { num: 37, stage: 'group', group: 'H', date: '2026-06-21', time: '13:00', location: 'EUA / México (Grupo H)',                  home: t('ESP'), away: t('KSA') },
   { num: 38, stage: 'group', group: 'G', date: '2026-06-21', time: '16:00', location: 'Costa Oeste EUA / Canadá (Grupo G)',      home: t('BEL'), away: t('IRN') },
   { num: 39, stage: 'group', group: 'H', date: '2026-06-21', time: '19:00', location: 'EUA / México (Grupo H)',                  home: t('URU'), away: t('CPV') },
@@ -151,14 +151,14 @@ export const MATCHES_2026: Match2026[] = [
   { num: 100, stage: 'qf', date: '2026-07-12', time: 'a definir', location: 'Kansas City (EUA)',                        home: w(95), away: w(96) },
 
   // Semis
-  { num: 101, stage: 'sf', date: '2026-07-14', time: '20:00', location: 'AT&T Stadium, Dallas/Arlington (EUA)',          home: w(97), away: w(98) },
-  { num: 102, stage: 'sf', date: '2026-07-15', time: '19:00', location: 'Mercedes-Benz Stadium, Atlanta (EUA)',          home: w(99), away: w(100) },
+  { num: 101, stage: 'sf', date: '2026-07-14', time: '16:00', location: 'AT&T Stadium, Dallas/Arlington (EUA)',          home: w(97), away: w(98) },
+  { num: 102, stage: 'sf', date: '2026-07-15', time: '16:00', location: 'Mercedes-Benz Stadium, Atlanta (EUA)',          home: w(99), away: w(100) },
 
   // 3º lugar
-  { num: 103, stage: 'tp', date: '2026-07-18', time: '17:00', location: 'Hard Rock Stadium, Miami (EUA)',                home: l(101), away: l(102) },
+  { num: 103, stage: 'tp', date: '2026-07-18', time: '18:00', location: 'Hard Rock Stadium, Miami (EUA)',                home: l(101), away: l(102) },
 
   // Final
-  { num: 104, stage: 'final', date: '2026-07-19', time: '18:00', location: 'MetLife Stadium, Nova York/NJ (EUA)',        home: w(101), away: w(102) },
+  { num: 104, stage: 'final', date: '2026-07-19', time: '16:00', location: 'MetLife Stadium, Nova York/NJ (EUA)',        home: w(101), away: w(102) },
 ];
 
 export const STAGE_LABEL: Record<Stage, string> = {
