@@ -37,6 +37,12 @@ export interface GroupStandings {
   rows: TeamStanding[];
 }
 
+export interface OverallStanding extends TeamStanding {
+  group: string;
+  /** posição (1-based) dentro do próprio grupo */
+  groupPosition: number;
+}
+
 function emptyRow(teamId: string): TeamStanding {
   return {
     teamId,
@@ -104,6 +110,27 @@ export function computeStandings(scores: Scores): Record<string, GroupStandings>
     result[group] = { group, rows: sortStandings(Object.values(rows)) };
   }
   return result;
+}
+
+/**
+ * Classificação geral: todos os times ranqueados juntos (independente do grupo),
+ * ordenados por pontos / saldo de gols / gols pró. Mantém a referência ao grupo
+ * e à posição dentro dele — útil pra comparar 3º colocados, etc.
+ */
+export function computeOverallStandings(scores: Scores): OverallStanding[] {
+  const byGroup = computeStandings(scores);
+  const all: OverallStanding[] = [];
+  for (const gs of Object.values(byGroup)) {
+    gs.rows.forEach((row, i) => {
+      all.push({ ...row, group: gs.group, groupPosition: i + 1 });
+    });
+  }
+  return all.sort((a, b) => {
+    if (b.points !== a.points) return b.points - a.points;
+    if (b.goalDiff !== a.goalDiff) return b.goalDiff - a.goalDiff;
+    if (b.goalsFor !== a.goalsFor) return b.goalsFor - a.goalsFor;
+    return a.teamId.localeCompare(b.teamId);
+  });
 }
 
 /**
