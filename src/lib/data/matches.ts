@@ -1,6 +1,7 @@
 /**
  * Tabela completa da Copa do Mundo FIFA 2026 — 104 jogos.
- * Horários em UTC-3 (Brasília). Fonte: tabela oficial FIFA (2024).
+ * Horários em UTC-3 (Brasília), convertidos da tabela oficial FIFA
+ * (horário do Leste dos EUA + 1h). Inclui fase de grupos e mata-mata.
  *
  * Cada lado do jogo (`home` / `away`) é um `MatchSide` que pode ser:
  *  - team:      seleção definida (fase de grupos)
@@ -117,38 +118,38 @@ export const MATCHES_2026: Match2026[] = [
   { num: 72, stage: 'group', group: 'J', date: '2026-06-27', time: '23:00', location: 'EUA (Grupo J)',                            home: t('JOR'), away: t('ARG') },
 
   // 32-avos (Round of 32)
-  { num: 73, stage: 'r32', date: '2026-06-28', time: 'a definir', location: 'Los Angeles (EUA)',                        home: pos('A', 2), away: pos('B', 2) },
-  { num: 74, stage: 'r32', date: '2026-06-29', time: 'a definir', location: 'Boston/Foxborough (EUA)',                  home: pos('E', 1), away: third('A/B/C/D/F') },
-  { num: 75, stage: 'r32', date: '2026-06-29', time: 'a definir', location: 'Monterrey (MEX)',                          home: pos('F', 1), away: pos('C', 2) },
-  { num: 76, stage: 'r32', date: '2026-06-29', time: 'a definir', location: 'Houston (EUA)',                            home: pos('C', 1), away: pos('F', 2) },
-  { num: 77, stage: 'r32', date: '2026-06-30', time: 'a definir', location: 'Nova York/NJ (EUA)',                       home: pos('I', 1), away: third('C/D/F/G/H') },
-  { num: 78, stage: 'r32', date: '2026-06-30', time: 'a definir', location: 'Dallas/Arlington (EUA)',                   home: pos('E', 2), away: pos('I', 2) },
-  { num: 79, stage: 'r32', date: '2026-06-30', time: 'a definir', location: 'Estádio Azteca, Cidade do México (MEX)',   home: pos('A', 1), away: third('C/E/F/H/I') },
-  { num: 80, stage: 'r32', date: '2026-07-01', time: 'a definir', location: 'Atlanta (EUA)',                            home: pos('L', 1), away: third('E/H/I/J/K') },
-  { num: 81, stage: 'r32', date: '2026-07-01', time: 'a definir', location: 'Santa Clara/SF (EUA)',                     home: pos('D', 1), away: third('B/E/F/I/J') },
-  { num: 82, stage: 'r32', date: '2026-07-01', time: 'a definir', location: 'Seattle (EUA)',                            home: pos('G', 1), away: third('A/E/H/I/J') },
-  { num: 83, stage: 'r32', date: '2026-07-02', time: 'a definir', location: 'Toronto (CAN)',                            home: pos('K', 2), away: pos('L', 2) },
-  { num: 84, stage: 'r32', date: '2026-07-02', time: 'a definir', location: 'Los Angeles (EUA)',                        home: pos('H', 1), away: pos('J', 2) },
-  { num: 85, stage: 'r32', date: '2026-07-02', time: 'a definir', location: 'Vancouver (CAN)',                          home: pos('B', 1), away: third('E/F/G/I/J') },
-  { num: 86, stage: 'r32', date: '2026-07-03', time: 'a definir', location: 'Miami (EUA)',                              home: pos('J', 1), away: pos('H', 2) },
-  { num: 87, stage: 'r32', date: '2026-07-03', time: 'a definir', location: 'Kansas City (EUA)',                        home: pos('K', 1), away: third('D/E/I/J/L') },
-  { num: 88, stage: 'r32', date: '2026-07-03', time: 'a definir', location: 'Dallas/Arlington (EUA)',                   home: pos('D', 2), away: pos('G', 2) },
+  { num: 73, stage: 'r32', date: '2026-06-28', time: '16:00', location: 'Los Angeles (EUA)',                        home: pos('A', 2), away: pos('B', 2) },
+  { num: 74, stage: 'r32', date: '2026-06-29', time: '17:30', location: 'Boston/Foxborough (EUA)',                  home: pos('E', 1), away: third('A/B/C/D/F') },
+  { num: 75, stage: 'r32', date: '2026-06-29', time: '22:00', location: 'Monterrey (MEX)',                          home: pos('F', 1), away: pos('C', 2) },
+  { num: 76, stage: 'r32', date: '2026-06-29', time: '14:00', location: 'Houston (EUA)',                            home: pos('C', 1), away: pos('F', 2) },
+  { num: 77, stage: 'r32', date: '2026-06-30', time: '22:00', location: 'Nova York/NJ (EUA)',                       home: pos('I', 1), away: third('C/D/F/G/H') },
+  { num: 78, stage: 'r32', date: '2026-06-30', time: '18:00', location: 'Dallas/Arlington (EUA)',                   home: pos('E', 2), away: pos('I', 2) },
+  { num: 79, stage: 'r32', date: '2026-06-30', time: '23:00', location: 'Estádio Azteca, Cidade do México (MEX)',   home: pos('A', 1), away: third('C/E/F/H/I') },
+  { num: 80, stage: 'r32', date: '2026-07-01', time: '13:00', location: 'Atlanta (EUA)',                            home: pos('L', 1), away: third('E/H/I/J/K') },
+  { num: 81, stage: 'r32', date: '2026-07-01', time: '21:00', location: 'Santa Clara/SF (EUA)',                     home: pos('D', 1), away: third('B/E/F/I/J') },
+  { num: 82, stage: 'r32', date: '2026-07-01', time: '17:00', location: 'Seattle (EUA)',                            home: pos('G', 1), away: third('A/E/H/I/J') },
+  { num: 83, stage: 'r32', date: '2026-07-02', time: '20:00', location: 'Toronto (CAN)',                            home: pos('K', 2), away: pos('L', 2) },
+  { num: 84, stage: 'r32', date: '2026-07-02', time: '16:00', location: 'Los Angeles (EUA)',                        home: pos('H', 1), away: pos('J', 2) },
+  { num: 85, stage: 'r32', date: '2026-07-03', time: '00:00', location: 'Vancouver (CAN)',                          home: pos('B', 1), away: third('E/F/G/I/J') },
+  { num: 86, stage: 'r32', date: '2026-07-03', time: '19:00', location: 'Miami (EUA)',                              home: pos('J', 1), away: pos('H', 2) },
+  { num: 87, stage: 'r32', date: '2026-07-03', time: '22:30', location: 'Kansas City (EUA)',                        home: pos('K', 1), away: third('D/E/I/J/L') },
+  { num: 88, stage: 'r32', date: '2026-07-03', time: '15:00', location: 'Dallas/Arlington (EUA)',                   home: pos('D', 2), away: pos('G', 2) },
 
   // Oitavas
-  { num: 89, stage: 'r16', date: '2026-07-04', time: 'a definir', location: 'Filadélfia (EUA)',                         home: w(74), away: w(77) },
-  { num: 90, stage: 'r16', date: '2026-07-04', time: 'a definir', location: 'Houston (EUA)',                            home: w(73), away: w(75) },
-  { num: 91, stage: 'r16', date: '2026-07-05', time: 'a definir', location: 'Nova York/NJ (EUA)',                       home: w(76), away: w(78) },
-  { num: 92, stage: 'r16', date: '2026-07-05', time: 'a definir', location: 'Estádio Azteca, Cidade do México (MEX)',   home: w(79), away: w(80) },
-  { num: 93, stage: 'r16', date: '2026-07-06', time: 'a definir', location: 'Dallas/Arlington (EUA)',                   home: w(83), away: w(84) },
-  { num: 94, stage: 'r16', date: '2026-07-06', time: 'a definir', location: 'Seattle (EUA)',                            home: w(81), away: w(82) },
-  { num: 95, stage: 'r16', date: '2026-07-07', time: 'a definir', location: 'Atlanta (EUA)',                            home: w(86), away: w(88) },
-  { num: 96, stage: 'r16', date: '2026-07-07', time: 'a definir', location: 'Vancouver (CAN)',                          home: w(85), away: w(87) },
+  { num: 89, stage: 'r16', date: '2026-07-04', time: '18:00', location: 'Filadélfia (EUA)',                         home: w(74), away: w(77) },
+  { num: 90, stage: 'r16', date: '2026-07-04', time: '14:00', location: 'Houston (EUA)',                            home: w(73), away: w(75) },
+  { num: 91, stage: 'r16', date: '2026-07-05', time: '17:00', location: 'Nova York/NJ (EUA)',                       home: w(76), away: w(78) },
+  { num: 92, stage: 'r16', date: '2026-07-05', time: '21:00', location: 'Estádio Azteca, Cidade do México (MEX)',   home: w(79), away: w(80) },
+  { num: 93, stage: 'r16', date: '2026-07-06', time: '16:00', location: 'Dallas/Arlington (EUA)',                   home: w(83), away: w(84) },
+  { num: 94, stage: 'r16', date: '2026-07-06', time: '18:00', location: 'Seattle (EUA)',                            home: w(81), away: w(82) },
+  { num: 95, stage: 'r16', date: '2026-07-07', time: '13:00', location: 'Atlanta (EUA)',                            home: w(86), away: w(88) },
+  { num: 96, stage: 'r16', date: '2026-07-07', time: '17:00', location: 'Vancouver (CAN)',                          home: w(85), away: w(87) },
 
   // Quartas
-  { num: 97,  stage: 'qf', date: '2026-07-09', time: 'a definir', location: 'Boston/Foxborough (EUA)',                  home: w(89), away: w(90) },
-  { num: 98,  stage: 'qf', date: '2026-07-10', time: 'a definir', location: 'Los Angeles (EUA)',                        home: w(93), away: w(94) },
-  { num: 99,  stage: 'qf', date: '2026-07-12', time: 'a definir', location: 'Miami (EUA)',                              home: w(91), away: w(92) },
-  { num: 100, stage: 'qf', date: '2026-07-12', time: 'a definir', location: 'Kansas City (EUA)',                        home: w(95), away: w(96) },
+  { num: 97,  stage: 'qf', date: '2026-07-09', time: '17:00', location: 'Boston/Foxborough (EUA)',                  home: w(89), away: w(90) },
+  { num: 98,  stage: 'qf', date: '2026-07-10', time: '16:00', location: 'Los Angeles (EUA)',                        home: w(93), away: w(94) },
+  { num: 99,  stage: 'qf', date: '2026-07-11', time: '18:00', location: 'Miami (EUA)',                              home: w(91), away: w(92) },
+  { num: 100, stage: 'qf', date: '2026-07-11', time: '22:00', location: 'Kansas City (EUA)',                        home: w(95), away: w(96) },
 
   // Semis
   { num: 101, stage: 'sf', date: '2026-07-14', time: '16:00', location: 'AT&T Stadium, Dallas/Arlington (EUA)',          home: w(97), away: w(98) },
