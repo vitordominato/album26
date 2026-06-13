@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Loader2, CalendarDays, BarChart3, Trophy } from 'lucide-react';
+import { Loader2, CalendarDays, BarChart3, Trophy, ListOrdered } from 'lucide-react';
 import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,8 +19,10 @@ import {
 import { TEAMS_SEED } from '@/lib/data/teams';
 import {
   allGroupsComplete,
+  computeOverallStandings,
   computeStandings,
   resolveSides,
+  type OverallStanding,
   type Scores,
 } from '@/lib/standings';
 import { cn } from '@/lib/utils';
@@ -54,6 +56,7 @@ export default function Matches() {
 
   const resolved = useMemo(() => resolveSides(scores), [scores]);
   const standings = useMemo(() => computeStandings(scores), [scores]);
+  const overall = useMemo(() => computeOverallStandings(scores), [scores]);
 
   const matchesSorted = useMemo(
     () => [...MATCHES_2026].sort((a, b) => matchTimestamp(a) - matchTimestamp(b) || a.num - b.num),
@@ -107,12 +110,15 @@ export default function Matches() {
       )}
 
       <Tabs defaultValue="calendar">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="calendar" className="gap-1">
             <CalendarDays className="h-4 w-4" /> Calendário
           </TabsTrigger>
           <TabsTrigger value="standings" className="gap-1">
             <BarChart3 className="h-4 w-4" /> Grupos
+          </TabsTrigger>
+          <TabsTrigger value="overall" className="gap-1">
+            <ListOrdered className="h-4 w-4" /> Geral
           </TabsTrigger>
           <TabsTrigger value="bracket" className="gap-1">
             <Trophy className="h-4 w-4" /> Mata-mata
@@ -133,6 +139,10 @@ export default function Matches() {
 
         <TabsContent value="standings">
           <StandingsView standings={standings} teamById={teamById} />
+        </TabsContent>
+
+        <TabsContent value="overall">
+          <OverallStandingsView overall={overall} teamById={teamById} />
         </TabsContent>
 
         <TabsContent value="bracket">
@@ -480,6 +490,94 @@ function StandingsView({
           </CardContent>
         </Card>
       ))}
+    </div>
+  );
+}
+
+// ============================================================
+// Classificação geral (todos os times juntos)
+// ============================================================
+
+function OverallStandingsView({
+  overall,
+  teamById,
+}: {
+  overall: OverallStanding[];
+  teamById: Record<string, Team>;
+}) {
+  const anyPlayed = overall.some((r) => r.played > 0);
+
+  if (!anyPlayed) {
+    return (
+      <p className="mt-6 rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+        Nenhum placar registrado ainda. Preencha os jogos da fase de grupos na aba{' '}
+        <strong>Calendário</strong> para ver a classificação geral.
+      </p>
+    );
+  }
+
+  return (
+    <div className="mt-3">
+      <Card>
+        <CardContent className="pt-3">
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead className="text-muted-foreground">
+                <tr>
+                  <th className="pb-1 text-left font-medium">#</th>
+                  <th className="pb-1 text-left font-medium">Time</th>
+                  <th className="pb-1 text-center font-medium">Gr</th>
+                  <th className="pb-1 text-right font-medium">J</th>
+                  <th className="pb-1 text-right font-medium">V</th>
+                  <th className="pb-1 text-right font-medium">E</th>
+                  <th className="pb-1 text-right font-medium">D</th>
+                  <th className="pb-1 text-right font-medium">SG</th>
+                  <th className="pb-1 text-right font-bold">P</th>
+                </tr>
+              </thead>
+              <tbody>
+                {overall.map((r, i) => {
+                  const team = teamById[r.teamId];
+                  return (
+                    <tr key={r.teamId} className="border-t border-border/60">
+                      <td className="py-1 text-left tabular-nums">{i + 1}</td>
+                      <td className="py-1 text-left">
+                        <div className="flex items-center gap-2">
+                          {team && (
+                            <img
+                              src={team.flagUrl}
+                              alt=""
+                              className="h-3.5 w-5 rounded-sm object-cover ring-1 ring-border"
+                              loading="lazy"
+                            />
+                          )}
+                          <span className="truncate">{team?.namePt ?? r.teamId}</span>
+                        </div>
+                      </td>
+                      <td className="py-1 text-center tabular-nums text-muted-foreground">
+                        {r.group}
+                        {r.groupPosition}
+                      </td>
+                      <td className="py-1 text-right tabular-nums">{r.played}</td>
+                      <td className="py-1 text-right tabular-nums">{r.won}</td>
+                      <td className="py-1 text-right tabular-nums">{r.drawn}</td>
+                      <td className="py-1 text-right tabular-nums">{r.lost}</td>
+                      <td className={cn('py-1 text-right tabular-nums', r.goalDiff > 0 && 'text-fifa-green', r.goalDiff < 0 && 'text-destructive')}>
+                        {r.goalDiff > 0 ? `+${r.goalDiff}` : r.goalDiff}
+                      </td>
+                      <td className="py-1 text-right font-bold tabular-nums">{r.points}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-2 text-[10px] text-muted-foreground">
+            Todos os times ranqueados por pontos · saldo de gols · gols pró. A coluna{' '}
+            <strong>Gr</strong> mostra o grupo e a posição dentro dele.
+          </p>
+        </CardContent>
+      </Card>
     </div>
   );
 }
