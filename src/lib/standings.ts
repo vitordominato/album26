@@ -3,15 +3,15 @@
  *
  * Pure functions: recebem os jogos + placares e retornam tabela / brackets resolvidos.
  *
- * Limitação conhecida da progressão: a alocação oficial FIFA dos 8 melhores
- * 3º colocados em 32-avos depende de uma tabela de combinatória (qual conjunto
- * de 8 grupos avança). Aqui usamos uma aproximação razoável: ordenamos os
- * thirds e atribuímos do melhor pro pior aos slots que aceitam seu grupo
- * (greedy), sem garantir o mapping oficial.
+ * A alocação dos 8 melhores 3º colocados em 32-avos segue a tabela oficial da
+ * FIFA (Anexo C, 495 combinações), em `THIRD_PLACE_ALLOCATION`: para o conjunto
+ * de 8 grupos cujos 3º colocados avançam, a tabela define exatamente contra qual
+ * grupo-vencedor cada 3º colocado joga — sem heurística.
  */
 import type { MatchSide } from '@/lib/data/matches';
 import { MATCHES_2026 } from '@/lib/data/matches';
 import { TEAMS_SEED } from '@/lib/data/teams';
+import { THIRD_PLACE_ALLOCATION, THIRD_WINNER_SLOTS } from '@/lib/data/thirdPlaceAllocation';
 
 export interface ScoreEntry {
   homeScore: number;
@@ -150,8 +150,7 @@ export function resolveSides(scores: Scores): Record<number, { home: string | nu
   const winners: Record<number, string | null> = {};
   const losers: Record<number, string | null> = {};
 
-  // assigned thirds per group → teamId (após o greedy)
-  const thirdAssignments: Record<string, string> = {};
+  // 3º colocado de cada grupo (com jogos disputados) → time
   const groupThirds: Array<{ group: string; teamId: string; row: TeamStanding }> = [];
   for (const gs of Object.values(standings)) {
     const third = gs.rows[2];
@@ -159,39 +158,48 @@ export function resolveSides(scores: Scores): Record<number, { home: string | nu
       groupThirds.push({ group: gs.group, teamId: third.teamId, row: third });
     }
   }
-  // melhores 3º (ordenados por pontos / GD / GF)
+  // melhores 3º (ordenados por pontos / GD / GF) — define QUAIS 8 grupos avançam
   groupThirds.sort((a, b) => {
     if (b.row.points !== a.row.points) return b.row.points - a.row.points;
     if (b.row.goalDiff !== a.row.goalDiff) return b.row.goalDiff - a.row.goalDiff;
     if (b.row.goalsFor !== a.row.goalsFor) return b.row.goalsFor - a.row.goalsFor;
     return a.row.teamId.localeCompare(b.row.teamId);
   });
-  const bestThirdGroups = new Set(groupThirds.slice(0, 8).map((t) => t.group));
-  for (const t of groupThirds) {
-    if (bestThirdGroups.has(t.group)) thirdAssignments[t.group] = t.teamId;
+  const bestThirds = groupThirds.slice(0, 8);
+  const thirdTeamByGroup: Record<string, string> = {};
+  for (const t of bestThirds) thirdTeamByGroup[t.group] = t.teamId;
+
+  // Tabela oficial FIFA (Anexo C): a chave é o conjunto dos 8 grupos
+  // classificados em ordem alfabética; o valor diz, para cada slot de vencedor
+  // (1A,1B,1D,1E,1G,1I,1K,1L), qual grupo-3º o enfrenta.
+  const allocationKey = bestThirds.map((t) => t.group).sort().join('');
+  const allocation = THIRD_PLACE_ALLOCATION[allocationKey];
+  // slot de vencedor (ex.: '1E') → grupo do 3º colocado alocado (ex.: 'D')
+  const winnerSlotToThirdGroup: Record<string, string> = {};
+  if (allocation) {
+    THIRD_WINNER_SLOTS.forEach((slot, i) => {
+      winnerSlotToThirdGroup[slot] = allocation[i];
+    });
   }
 
-  // greedy: para cada slot `thirdOf` (em ordem do número do jogo), pega o
-  // melhor 3º (na ordem ranking) cujo grupo está no pool e que ainda não
-  // foi alocado.
-  const usedThirds = new Set<string>();
+  // Cada slot `thirdOf` é o adversário de um vencedor de grupo (groupPos pos 1)
+  // no mesmo jogo. O slot '1' + grupo-vencedor identifica a linha da tabela.
   const thirdSlotResolution: Record<number, string | null> = {};
-  for (const m of MATCHES_2026) {
-    for (const side of [m.home, m.away]) {
-      if (side.kind === 'thirdOf') {
-        let picked: string | null = null;
-        for (const t of groupThirds) {
-          if (!bestThirdGroups.has(t.group)) continue;
-          if (!side.pool.includes(t.group)) continue;
-          if (usedThirds.has(t.teamId)) continue;
-          picked = t.teamId;
-          break;
-        }
-        if (picked) {
-          usedThirds.add(picked);
-          // chave: matchNum + lado (uso o sinal: positivo home, negativo away)
-          const key = side === m.home ? m.num : -m.num;
-          thirdSlotResolution[key] = picked;
+  if (allocation) {
+    for (const m of MATCHES_2026) {
+      const sides: Array<[MatchSide, MatchSide, boolean]> = [
+        [m.home, m.away, true],
+        [m.away, m.home, false],
+      ];
+      for (const [side, opponent, isHome] of sides) {
+        if (side.kind !== 'thirdOf') continue;
+        if (opponent.kind !== 'groupPos' || opponent.position !== 1) continue;
+        const winnerSlot = `1${opponent.group}`;
+        const thirdGroup = winnerSlotToThirdGroup[winnerSlot];
+        const teamId = thirdGroup ? thirdTeamByGroup[thirdGroup] : undefined;
+        if (teamId) {
+          const key = isHome ? m.num : -m.num;
+          thirdSlotResolution[key] = teamId;
         }
       }
     }
