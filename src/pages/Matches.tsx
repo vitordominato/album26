@@ -179,7 +179,12 @@ function CalendarView({
   resolved: Record<number, { home: string | null; away: string | null }>;
   teamById: Record<string, Team>;
   loading: boolean;
-  onSetScore: (n: number, h: number, a: number) => Promise<void>;
+  onSetScore: (
+    n: number,
+    h: number,
+    a: number,
+    pens?: { homePens: number; awayPens: number } | null
+  ) => Promise<void>;
   onClear: (n: number) => Promise<void>;
 }) {
   const [filter, setFilter] = useState<'all' | Stage>('all');
@@ -257,15 +262,23 @@ function MatchCard({
   onClear,
 }: {
   match: Match2026;
-  score: { homeScore: number; awayScore: number } | undefined;
+  score: { homeScore: number; awayScore: number; homePens?: number; awayPens?: number } | undefined;
   resolved: { home: string | null; away: string | null } | undefined;
   teamById: Record<string, Team>;
-  onSetScore: (n: number, h: number, a: number) => Promise<void>;
+  onSetScore: (
+    n: number,
+    h: number,
+    a: number,
+    pens?: { homePens: number; awayPens: number } | null
+  ) => Promise<void>;
   onClear: (n: number) => Promise<void>;
 }) {
+  const isKnockout = match.stage !== 'group';
   const [editing, setEditing] = useState(false);
   const [h, setH] = useState<string>(score?.homeScore != null ? String(score.homeScore) : '');
   const [a, setA] = useState<string>(score?.awayScore != null ? String(score.awayScore) : '');
+  const [ph, setPh] = useState<string>(score?.homePens != null ? String(score.homePens) : '');
+  const [pa, setPa] = useState<string>(score?.awayPens != null ? String(score.awayPens) : '');
   const [busy, setBusy] = useState(false);
 
   const homeTeamId = resolved?.home ?? (match.home.kind === 'team' ? match.home.teamId : null);
@@ -275,14 +288,27 @@ function MatchCard({
 
   const canEdit = !!homeTeamId && !!awayTeamId;
 
+  // num mata-mata, empate no tempo normal exige pênaltis para definir quem avança
+  const needsPens = isKnockout && h !== '' && a !== '' && Number(h) === Number(a);
+
   async function save() {
     if (!canEdit) return;
     const hi = Number(h);
     const ai = Number(a);
     if (!Number.isFinite(hi) || hi < 0 || !Number.isFinite(ai) || ai < 0) return;
+
+    let pens: { homePens: number; awayPens: number } | null = null;
+    if (isKnockout && hi === ai) {
+      const phi = Number(ph);
+      const pai = Number(pa);
+      if (!Number.isFinite(phi) || phi < 0 || !Number.isFinite(pai) || pai < 0) return;
+      if (phi === pai) return; // pênaltis não podem empatar — precisa de um vencedor
+      pens = { homePens: phi, awayPens: pai };
+    }
+
     setBusy(true);
     try {
-      await onSetScore(match.num, hi, ai);
+      await onSetScore(match.num, hi, ai, pens);
       setEditing(false);
     } finally {
       setBusy(false);
@@ -295,11 +321,16 @@ function MatchCard({
       await onClear(match.num);
       setH('');
       setA('');
+      setPh('');
+      setPa('');
       setEditing(false);
     } finally {
       setBusy(false);
     }
   }
+
+  const isDrawWithPens =
+    score != null && score.homeScore === score.awayScore && score.homePens != null && score.awayPens != null;
 
   return (
     <div className="rounded-xl border border-border bg-card p-3">
@@ -343,6 +374,11 @@ function MatchCard({
               className="w-full rounded-lg bg-fifa-green/10 px-2 py-1 text-center font-mono text-lg font-bold tabular-nums text-fifa-gold"
             >
               {score.homeScore} <span className="text-muted-foreground">×</span> {score.awayScore}
+              {isDrawWithPens && (
+                <span className="block text-[10px] font-normal text-muted-foreground">
+                  pên. {score.homePens}–{score.awayPens}
+                </span>
+              )}
             </button>
           ) : (
             <button
@@ -361,6 +397,29 @@ function MatchCard({
 
         <Side label={awayTeam ? awayTeam.namePt : sideLabel(match.away, teamById)} team={awayTeam} align="start" />
       </div>
+
+      {editing && needsPens && (
+        <div className="mt-2 flex items-center justify-center gap-1 text-xs">
+          <span className="mr-1 text-muted-foreground">Pênaltis</span>
+          <Input
+            type="number"
+            inputMode="numeric"
+            min={0}
+            value={ph}
+            onChange={(e) => setPh(e.target.value)}
+            className="h-8 w-10 px-1 text-center"
+          />
+          <span className="text-muted-foreground">×</span>
+          <Input
+            type="number"
+            inputMode="numeric"
+            min={0}
+            value={pa}
+            onChange={(e) => setPa(e.target.value)}
+            className="h-8 w-10 px-1 text-center"
+          />
+        </div>
+      )}
 
       {editing && (
         <div className="mt-2 flex gap-2">
@@ -599,7 +658,12 @@ function BracketView({
   scores: Scores;
   resolved: Record<number, { home: string | null; away: string | null }>;
   teamById: Record<string, Team>;
-  onSetScore: (n: number, h: number, a: number) => Promise<void>;
+  onSetScore: (
+    n: number,
+    h: number,
+    a: number,
+    pens?: { homePens: number; awayPens: number } | null
+  ) => Promise<void>;
   onClear: (n: number) => Promise<void>;
   groupsDone: boolean;
 }) {
@@ -624,6 +688,11 @@ function BracketView({
           classificados nas eliminatórias.
         </div>
       )}
+      <div className="rounded-xl border border-border bg-card p-3 text-[11px] leading-relaxed text-muted-foreground">
+        <strong className="text-foreground">Regras do mata-mata:</strong> avançam os 1º e 2º de
+        cada grupo mais os 8 melhores 3º colocados. Jogo eliminatório que terminar empatado abre o
+        campo de <strong>pênaltis</strong> — informe o placar da disputa para definir quem avança.
+      </div>
       {stages.map((s) => (
         <div key={s}>
           <h3 className="mb-2 text-sm font-bold">{STAGE_LABEL[s]}</h3>

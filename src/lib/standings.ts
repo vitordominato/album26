@@ -16,6 +16,13 @@ import { TEAMS_SEED } from '@/lib/data/teams';
 export interface ScoreEntry {
   homeScore: number;
   awayScore: number;
+  /**
+   * Pênaltis no mata-mata. Só usados quando o tempo normal/prorrogação
+   * termina empatado (`homeScore === awayScore`) para definir quem avança.
+   * Ignorados na fase de grupos.
+   */
+  homePens?: number;
+  awayPens?: number;
 }
 
 export type Scores = Record<number, ScoreEntry | undefined>;
@@ -221,14 +228,27 @@ export function resolveSides(scores: Scores): Record<number, { home: string | nu
     const away = resolveSide(m.num, m.away, false);
     homeAway[m.num] = { home, away };
     const sc = scores[m.num];
-    if (sc && home && away && sc.homeScore !== sc.awayScore) {
+    let winnerSide: 'home' | 'away' | null = null;
+    if (sc && home && away) {
       if (sc.homeScore > sc.awayScore) {
-        winners[m.num] = home;
-        losers[m.num] = away;
-      } else {
-        winners[m.num] = away;
-        losers[m.num] = home;
+        winnerSide = 'home';
+      } else if (sc.awayScore > sc.homeScore) {
+        winnerSide = 'away';
+      } else if (
+        sc.homePens != null &&
+        sc.awayPens != null &&
+        sc.homePens !== sc.awayPens
+      ) {
+        // empate no tempo normal → quem venceu nos pênaltis avança
+        winnerSide = sc.homePens > sc.awayPens ? 'home' : 'away';
       }
+    }
+    if (winnerSide === 'home') {
+      winners[m.num] = home;
+      losers[m.num] = away;
+    } else if (winnerSide === 'away') {
+      winners[m.num] = away;
+      losers[m.num] = home;
     } else {
       winners[m.num] = null;
       losers[m.num] = null;

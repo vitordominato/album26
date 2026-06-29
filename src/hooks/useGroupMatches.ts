@@ -29,7 +29,12 @@ export function useGroupMatches(groupId: string | null) {
       (snap) => {
         const next: Scores = {};
         snap.forEach((d) => {
-          const data = d.data() as { homeScore?: number; awayScore?: number };
+          const data = d.data() as {
+            homeScore?: number;
+            awayScore?: number;
+            homePens?: number;
+            awayPens?: number;
+          };
           if (
             typeof data.homeScore === 'number' &&
             typeof data.awayScore === 'number'
@@ -37,6 +42,10 @@ export function useGroupMatches(groupId: string | null) {
             next[Number(d.id)] = {
               homeScore: data.homeScore,
               awayScore: data.awayScore,
+              ...(typeof data.homePens === 'number' &&
+              typeof data.awayPens === 'number'
+                ? { homePens: data.homePens, awayPens: data.awayPens }
+                : {}),
             };
           }
         });
@@ -48,12 +57,20 @@ export function useGroupMatches(groupId: string | null) {
     return unsub;
   }, [groupId]);
 
-  async function setScore(matchNum: number, homeScore: number, awayScore: number) {
+  async function setScore(
+    matchNum: number,
+    homeScore: number,
+    awayScore: number,
+    pens?: { homePens: number; awayPens: number } | null
+  ) {
     if (!groupId || !user) throw new Error('Sem grupo ativo ou usuário deslogado');
     const ref = doc(db, 'groups', groupId, 'matches', String(matchNum));
+    // setDoc sem merge sobrescreve o doc inteiro, então omitir os pênaltis
+    // já os remove quando não forem informados.
     await setDoc(ref, {
       homeScore,
       awayScore,
+      ...(pens ? { homePens: pens.homePens, awayPens: pens.awayPens } : {}),
       updatedBy: user.uid,
       updatedAt: serverTimestamp(),
     });
